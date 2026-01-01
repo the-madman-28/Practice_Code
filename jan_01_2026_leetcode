@@ -1,0 +1,16 @@
+class Solution {
+public:
+    vector<int> plusOne(vector<int>& digits) {
+        int extra=1;
+        for(int i=digits.size()-1;i>=0;i--){
+            int s = digits[i] + extra;
+            digits[i] = s%10;
+            extra = s/10;
+        }
+        if(extra==1){
+            digits.push_back(1);
+            reverse(digits.begin(),digits.end());
+        }
+        return digits;
+    }
+};
