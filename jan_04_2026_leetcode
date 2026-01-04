@@ -1,0 +1,22 @@
+class Solution {
+public:
+    static int sumFourDivisors(const vector<int>& a) noexcept {
+        const int n = a.size();
+        int result = 0;
+        for (int i = 0; i < n; ++i) {
+            const int x = a[i];
+            const int sq = sqrt(x);
+            if (x == sq * sq) continue;
+            int count = 2;
+            int sum = 1 + x;
+            for (int j = 2; j <= sq && count <= 4; ++j) {
+                if (x % j == 0) {
+                    count += 2;
+                    sum += j + (x / j);
+                }
+            }
+            if (count == 4) result += sum;
+        }
+        return result;
+    }
+};
