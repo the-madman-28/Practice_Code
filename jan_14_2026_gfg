@@ -1,0 +1,26 @@
+class Solution {
+  public:
+    int catchThieves(vector<char> &arr, int k) {
+        // Code here
+         int ans = 0;
+        queue<int>st, th;
+        for(int i=0;i<arr.size() ; i++){
+            if(arr[i] == 'P'){
+                while(!th.empty() && i- th.front() > k)th.pop();
+                if(!th.empty()){
+                    th.pop();
+                    ans++;
+                }else
+                    st.push(i);
+                }
+            else {
+                while(!st.empty() && i - st.front() >k )st.pop();
+                if(!st.empty()){
+                    st.pop();
+                    ans++;
+                }else th.push(i);
+            }
+        }
+        return ans;
+    }
+};
