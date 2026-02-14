@@ -1,5 +1,5 @@
 class Solution {
-  public:
+  public: 
   
     bool canPaint(vector<int>& arr, int k, int maxTime) {
         int painters = 1;
