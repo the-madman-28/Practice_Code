@@ -1,0 +1,25 @@
+class Solution {
+  public:
+    bool canAttend(vector<vector<int>> &arr) {
+        // Code Here
+        int s=arr.size();
+        bool ans =true;
+        
+        if(s>1)
+        {
+            sort(arr.begin(),arr.end());
+            
+            for(int i=1;i<arr.size();i++)
+            {
+                if(arr[i][0]<arr[i-1][1]){
+                    ans=false;
+                    break;
+                }
+                
+                else continue;
+            }
+        }
+        return ans;
+    }
+        
+};
