@@ -1,0 +1,32 @@
+class Solution {
+  public:
+  
+    static bool cmp(string a, string b) {
+        return a + b > b + a;
+    }
+  
+    string findLargest(vector<int> &arr) {
+        
+        vector<string> nums;
+        
+        // Convert integers to strings
+        for(int num : arr) {
+            nums.push_back(to_string(num));
+        }
+        
+        // Sort using custom comparator
+        sort(nums.begin(), nums.end(), cmp);
+        
+        // Edge case: if largest element is "0"
+        if(nums[0] == "0")
+            return "0";
+        
+        // Concatenate all strings
+        string result = "";
+        for(string s : nums) {
+            result += s;
+        }
+        
+        return result;
+    }
+};
