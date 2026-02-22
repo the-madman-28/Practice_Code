@@ -1,0 +1,27 @@
+class Solution {
+  public:
+    long subarrayXor(vector<int> &arr, int k) {
+        
+        unordered_map<int, long> freq;
+        long prefix_xor = 0;
+        long count = 0;
+        
+        for(int num : arr) {
+            
+            prefix_xor ^= num;
+            
+            // Case 1: If prefix itself equals k
+            if(prefix_xor == k)
+                count++;
+            
+            // Case 2: Check if (prefix_xor ^ k) seen before
+            if(freq.find(prefix_xor ^ k) != freq.end())
+                count += freq[prefix_xor ^ k];
+            
+            // Store prefix_xor
+            freq[prefix_xor]++;
+        }
+        
+        return count;
+    }
+};
