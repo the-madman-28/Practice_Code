@@ -1,31 +1,42 @@
 class Solution {
 public:
     int minOperations(string s, int k) {
-        int n = s.length();
-        if (k > n) return -1;
+        int zero = 0;
+        int len = s.length();
 
-        int z = 0;
-        for (char c : s)
-            if (c == '0') z++;
+        for (int i = 0; i < len; i++)
+            zero += ~s[i] & 1;
 
-        if (z == 0) return 0;
+        if (!zero)
+            return 0;
 
-        if (k == n) {
-            if (z == n) return 1;
-            return -1;
-        }
+        if (len == k)
+            return ((zero == len) << 1) - 1;
 
-        for (int t = (z + k - 1) / k; t <= 2*n; t++) {
-            long long total = 1LL * t * k;
+        int base = len - k;
 
-            if (total < z) continue;
-            if ((total - z) % 2 != 0) continue;
+        int odd = max(
+            (zero + k - 1) / k,
+            (len - zero + base - 1) / base
+        );
 
-            // ensure each zero can be flipped at most t times
-            // minimum required per zero = 1
-            if (t >= 1) return t;
-        }
+        odd += ~odd & 1;
 
-        return -1;
+        int even = max(
+            (zero + k - 1) / k,
+            (zero + base - 1) / base
+        );
+
+        even += even & 1;
+
+        int res = INT_MAX;
+
+        if ((k & 1) == (zero & 1))
+            res = min(res, odd);
+
+        if (~zero & 1)
+            res = min(res, even);
+
+        return res == INT_MAX ? -1 : res;
     }
 };
