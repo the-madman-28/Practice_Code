@@ -1,0 +1,50 @@
+class Solution {
+public:
+    
+    // how much height one worker can reduce in given time
+    long long canReduce(long long T, long long w) {
+        // solve w * x*(x+1)/2 <= T
+        // x*(x+1) <= 2T / w
+        
+        long long left = 0, right = 1e6; // enough range
+        
+        long long limit = (2 * T) / w;
+        
+        while (left <= right) {
+            long long mid = (left + right) / 2;
+            
+            if (mid * (mid + 1) <= limit)
+                left = mid + 1;
+            else
+                right = mid - 1;
+        }
+        
+        return right;
+    }
+    
+    long long minNumberOfSeconds(int mountainHeight, vector<int>& workerTimes) {
+        
+        long long left = 0, right = 1e18;
+        long long ans = right;
+        
+        while (left <= right) {
+            long long mid = (left + right) / 2;
+            
+            long long total = 0;
+            
+            for (int w : workerTimes) {
+                total += canReduce(mid, w);
+                if (total >= mountainHeight) break;
+            }
+            
+            if (total >= mountainHeight) {
+                ans = mid;
+                right = mid - 1;
+            } else {
+                left = mid + 1;
+            }
+        }
+        
+        return ans;
+    }
+};
