@@ -1,0 +1,41 @@
+class Solution {
+  public:
+    vector<vector<int>> verticalOrder(Node *root) {
+        vector<vector<int>> ans;
+        if (root == NULL) return ans;
+
+        // map: hd -> nodes
+        map<int, vector<int>> mp;
+
+        // queue for BFS -> node + horizontal distance
+        queue<pair<Node*, int>> q;
+
+        q.push({root, 0});
+
+        while (!q.empty()) {
+            auto it = q.front();
+            q.pop();
+
+            Node* node = it.first;
+            int hd = it.second;
+
+            // store node value
+            mp[hd].push_back(node->data);
+
+            // left child
+            if (node->left)
+                q.push({node->left, hd - 1});
+
+            // right child
+            if (node->right)
+                q.push({node->right, hd + 1});
+        }
+
+        // move map values to answer
+        for (auto &p : mp) {
+            ans.push_back(p.second);
+        }
+
+        return ans;
+    }
+};
