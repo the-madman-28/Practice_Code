@@ -1,0 +1,46 @@
+class Solution {
+  public:
+  
+    struct Info {
+        int size;
+        int minVal;
+        int maxVal;
+        bool isBST;
+    };
+    
+    Info dfs(Node* root, int &ans) {
+        if (!root) {
+            return {0, INT_MAX, INT_MIN, true};
+        }
+        
+        Info left = dfs(root->left, ans);
+        Info right = dfs(root->right, ans);
+        
+        Info curr;
+        
+        curr.size = left.size + right.size + 1;
+        
+        if (left.isBST && right.isBST &&
+            root->data > left.maxVal &&
+            root->data < right.minVal) {
+            
+            curr.minVal = min(root->data, left.minVal);
+            curr.maxVal = max(root->data, right.maxVal);
+            curr.isBST = true;
+            
+            ans = max(ans, curr.size);
+        }
+        else {
+            curr.isBST = false;
+        }
+        
+        return curr;
+    }
+  
+  
+    int largestBst(Node *root) {
+        int ans = 0;
+        dfs(root, ans);
+        return ans;
+    }
+};
