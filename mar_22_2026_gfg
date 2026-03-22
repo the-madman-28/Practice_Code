@@ -1,0 +1,63 @@
+class Solution {
+  public:
+    int orangesRot(vector<vector<int>>& mat) {
+        
+        int n = mat.size();
+        int m = mat[0].size();
+        
+        queue<pair<int,int>> q;
+        int fresh = 0;
+        
+        // push all rotten oranges
+        for (int i = 0; i < n; i++) {
+            for (int j = 0; j < m; j++) {
+                
+                if (mat[i][j] == 2)
+                    q.push({i, j});
+                
+                if (mat[i][j] == 1)
+                    fresh++;
+            }
+        }
+        
+        int time = 0;
+        
+        int dx[4] = {-1, 1, 0, 0};
+        int dy[4] = {0, 0, -1, 1};
+        
+        while (!q.empty() && fresh > 0) {
+            
+            int size = q.size();
+            
+            for (int k = 0; k < size; k++) {
+                
+                auto p = q.front();
+                q.pop();
+                
+                int x = p.first;
+                int y = p.second;
+                
+                for (int d = 0; d < 4; d++) {
+                    
+                    int nx = x + dx[d];
+                    int ny = y + dy[d];
+                    
+                    if (nx >= 0 && ny >= 0 &&
+                        nx < n && ny < m &&
+                        mat[nx][ny] == 1) {
+                        
+                        mat[nx][ny] = 2;
+                        fresh--;
+                        q.push({nx, ny});
+                    }
+                }
+            }
+            
+            time++;
+        }
+        
+        if (fresh > 0) return -1;
+        
+        return time;
+    }
+};
