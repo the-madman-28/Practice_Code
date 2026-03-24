@@ -1,0 +1,49 @@
+class Solution {
+public:
+    vector<vector<int>> constructProductMatrix(vector<vector<int>>& grid) {
+
+        int n = grid.size();
+        int m = grid[0].size();
+        int mod = 12345;
+
+        int N = n * m;
+
+        vector<long long> a;
+        a.reserve(N);
+
+        // flatten
+        for (int i = 0; i < n; i++) {
+            for (int j = 0; j < m; j++) {
+                a.push_back(grid[i][j] % mod);
+            }
+        }
+
+        vector<long long> pref(N, 1), suff(N, 1);
+
+        // prefix
+        for (int i = 1; i < N; i++) {
+            pref[i] = (pref[i-1] * a[i-1]) % mod;
+        }
+
+        // suffix
+        for (int i = N-2; i >= 0; i--) {
+            suff[i] = (suff[i+1] * a[i+1]) % mod;
+        }
+
+        vector<vector<int>> ans(n, vector<int>(m));
+
+        int idx = 0;
+
+        for (int i = 0; i < n; i++) {
+            for (int j = 0; j < m; j++) {
+
+                long long val = (pref[idx] * suff[idx]) % mod;
+                ans[i][j] = val;
+
+                idx++;
+            }
+        }
+
+        return ans;
+    }
+};
