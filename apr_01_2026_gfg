@@ -1,0 +1,21 @@
+class Solution {
+  public:
+    int countStrings(int n) {
+        
+        if (n == 1) return 2;
+        
+        long long dp0 = 1; // ending with 0
+        long long dp1 = 1; // ending with 1
+        
+        for (int i = 2; i <= n; i++) {
+            
+            long long new_dp0 = dp0 + dp1;
+            long long new_dp1 = dp0;
+            
+            dp0 = new_dp0;
+            dp1 = new_dp1;
+        }
+        
+        return dp0 + dp1;
+    }
+};
