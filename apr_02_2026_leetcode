@@ -1,0 +1,77 @@
+class Solution {
+public:
+    int maximumAmount(vector<vector<int>>& coins) {
+        int m = coins.size(), n = coins[0].size();
+
+        vector<vector<int>> prev(n, vector<int>(3, INT_MIN));
+        vector<vector<int>> curr(n, vector<int>(3, INT_MIN));
+
+        // Initialize (0,0)
+        for (int k = 0; k <= 2; k++) {
+            if (coins[0][0] >= 0) {
+                prev[0][k] = coins[0][0];
+            } else {
+                prev[0][k] = coins[0][0]; // take loss
+                if (k > 0) prev[0][k] = 0; // neutralize
+            }
+        }
+
+        // First row
+        for (int j = 1; j < n; j++) {
+            for (int k = 0; k <= 2; k++) {
+                if (coins[0][j] >= 0) {
+                    prev[j][k] = prev[j-1][k] + coins[0][j];
+                } else {
+                    int takeLoss = prev[j-1][k] + coins[0][j];
+                    int neutralize = (k > 0) ? prev[j-1][k-1] : INT_MIN;
+                    prev[j][k] = max(takeLoss, neutralize);
+                }
+            }
+        }
+
+        // Process remaining rows
+        for (int i = 1; i < m; i++) {
+
+            // First column
+            for (int k = 0; k <= 2; k++) {
+                if (coins[i][0] >= 0) {
+                    curr[0][k] = prev[0][k] + coins[i][0];
+                } else {
+                    int takeLoss = prev[0][k] + coins[i][0];
+                    int neutralize = (k > 0) ? prev[0][k-1] : INT_MIN;
+                    curr[0][k] = max(takeLoss, neutralize);
+                }
+            }
+
+            // Remaining columns
+            for (int j = 1; j < n; j++) {
+                for (int k = 0; k <= 2; k++) {
+
+                    int best = INT_MIN;
+
+                    // From top
+                    if (coins[i][j] >= 0) {
+                        best = max(best, prev[j][k] + coins[i][j]);
+                        best = max(best, curr[j-1][k] + coins[i][j]);
+                    } else {
+                        // take loss
+                        best = max(best, prev[j][k] + coins[i][j]);
+                        best = max(best, curr[j-1][k] + coins[i][j]);
+
+                        // neutralize
+                        if (k > 0) {
+                            best = max(best, prev[j][k-1]);
+                            best = max(best, curr[j-1][k-1]);
+                        }
+                    }
+
+                    curr[j][k] = best;
+                }
+            }
+
+            prev = curr; // move row
+        }
+
+        return max({prev[n-1][0], prev[n-1][1], prev[n-1][2]});
+    }
+};
