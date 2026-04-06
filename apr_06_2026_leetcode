@@ -1,0 +1,50 @@
+class Solution {
+public:
+    int robotSim(vector<int>& commands, vector<vector<int>>& obstacles) {
+        
+        // Direction vectors: N, E, S, W
+        vector<pair<int,int>> dir = {
+            {0,1}, {1,0}, {0,-1}, {-1,0}
+        };
+        
+        int d = 0; // start facing North
+        int x = 0, y = 0;
+        int maxDist = 0;
+        
+        // Store obstacles in set
+        unordered_set<long long> obs;
+        for(auto &o : obstacles){
+            long long key = (long long)o[0] << 32 | (unsigned int)o[1];
+            obs.insert(key);
+        }
+        
+        for(int cmd : commands){
+            
+            if(cmd == -1){ // turn right
+                d = (d + 1) % 4;
+            }
+            else if(cmd == -2){ // turn left
+                d = (d + 3) % 4;
+            }
+            else{
+                // move step by step
+                for(int step = 0; step < cmd; step++){
+                    int nx = x + dir[d].first;
+                    int ny = y + dir[d].second;
+                    
+                    long long key = (long long)nx << 32 | (unsigned int)ny;
+                    
+                    // obstacle check
+                    if(obs.count(key)) break;
+                    
+                    x = nx;
+                    y = ny;
+                    
+                    maxDist = max(maxDist, x*x + y*y);
+                }
+            }
+        }
+        
+        return maxDist;
+    }
+};
