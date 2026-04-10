@@ -1,0 +1,39 @@
+class Solution {
+  public:
+    vector<int> find3Numbers(vector<int> &arr) {
+        int n = arr.size();
+        if (n < 3) return {};
+
+        vector<int> leftMin(n, -1);
+        vector<int> rightMax(n, -1);
+
+        // Step 1: Fill leftMin
+        int minIndex = 0;
+        for (int i = 1; i < n; i++) {
+            if (arr[i] > arr[minIndex]) {
+                leftMin[i] = minIndex;
+            } else {
+                minIndex = i;
+            }
+        }
+
+        // Step 2: Fill rightMax
+        int maxIndex = n - 1;
+        for (int i = n - 2; i >= 0; i--) {
+            if (arr[i] < arr[maxIndex]) {
+                rightMax[i] = maxIndex;
+            } else {
+                maxIndex = i;
+            }
+        }
+
+        // Step 3: Find valid triplet
+        for (int j = 0; j < n; j++) {
+            if (leftMin[j] != -1 && rightMax[j] != -1) {
+                return {arr[leftMin[j]], arr[j], arr[rightMax[j]]};
+            }
+        }
+
+        return {};
+    }
+};
