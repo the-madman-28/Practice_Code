@@ -1,0 +1,40 @@
+class Solution {
+public:
+    int getDist(int a, int b) {
+        if (a == 26) return 0; // unused finger
+        int x1 = a / 6, y1 = a % 6;
+        int x2 = b / 6, y2 = b % 6;
+        return abs(x1 - x2) + abs(y1 - y2);
+    }
+
+    int minimumDistance(string word) {
+        int n = word.size();
+        vector<int> dp(27, 0); // 26 letters + 1 unused
+
+        int total = 0;
+
+        for (int i = 0; i < n - 1; i++) {
+            int cur = word[i] - 'A';
+            int next = word[i + 1] - 'A';
+
+            vector<int> new_dp(27, 0);
+
+            for (int j = 0; j <= 26; j++) {
+                // Case 1: same finger moves
+                new_dp[j] = max(new_dp[j], dp[j]);
+
+                // Case 2: use second finger
+                int gain = getDist(cur, next) - getDist(j, next);
+                new_dp[cur] = max(new_dp[cur], dp[j] + gain);
+            }
+
+            dp = new_dp;
+            total += getDist(cur, next);
+        }
+
+        int maxSaving = 0;
+        for (int x : dp) maxSaving = max(maxSaving, x);
+
+        return total - maxSaving;
+    }
+};
