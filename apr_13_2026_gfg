@@ -1,0 +1,59 @@
+class Solution {
+  public:
+    vector<int> nextPalindrome(vector<int>& num) {
+        int n = num.size();
+
+        // Step 0: check all 9s
+        bool all9 = true;
+        for (int x : num) {
+            if (x != 9) {
+                all9 = false;
+                break;
+            }
+        }
+
+        if (all9) {
+            vector<int> res(n + 1, 0);
+            res[0] = res[n] = 1;
+            return res;
+        }
+
+        vector<int> res = num;
+
+        // Step 1: mirror left → right
+        for (int i = 0; i < n / 2; i++) {
+            res[n - i - 1] = res[i];
+        }
+
+        // check if mirrored > original
+        if (res > num) return res;
+
+        // Step 2: add 1 to middle
+        int carry = 1;
+        int mid = n / 2;
+
+        if (n % 2 == 1) {
+            res[mid] += 1;
+            carry = res[mid] / 10;
+            res[mid] %= 10;
+            mid--;
+        } else {
+            mid = n / 2 - 1;
+        }
+
+        // propagate carry to left side
+        while (mid >= 0 && carry) {
+            res[mid] += carry;
+            carry = res[mid] / 10;
+            res[mid] %= 10;
+            mid--;
+        }
+
+        // mirror again
+        for (int i = 0; i < n / 2; i++) {
+            res[n - i - 1] = res[i];
+        }
+
+        return res;
+    }
+};
