@@ -1,0 +1,30 @@
+class Solution {
+  public:
+    string URLify(string &s) {
+        int n = s.size();
+        int spaces = 0;
+
+        for (char c : s) {
+            if (c == ' ') spaces++;
+        }
+
+        int newLen = n + 2 * spaces;
+        s.resize(newLen);
+
+        int i = n - 1;
+        int j = newLen - 1;
+
+        while (i >= 0) {
+            if (s[i] == ' ') {
+                s[j--] = '0';
+                s[j--] = '2';
+                s[j--] = '%';
+            } else {
+                s[j--] = s[i];
+            }
+            i--;
+        }
+
+        return s;
+    }
+};
