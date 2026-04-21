@@ -1,0 +1,52 @@
+class Solution {
+public:
+    
+    int gcd(int a, int b) {
+        if (b == 0) return a;
+        return gcd(b, a % b);
+    }
+    
+    int pour(int fromCap, int toCap, int d) {
+        int from = fromCap;  // fill from jug
+        int to = 0;
+        
+        int step = 1; // filling counts as 1 step
+        
+        while (from != d && to != d) {
+            
+            // pour water
+            int temp = min(from, toCap - to);
+            to += temp;
+            from -= temp;
+            step++;
+            
+            // check if done
+            if (from == d || to == d)
+                break;
+            
+            // if from becomes empty, refill
+            if (from == 0) {
+                from = fromCap;
+                step++;
+            }
+            
+            // if to becomes full, empty it
+            if (to == toCap) {
+                to = 0;
+                step++;
+            }
+        }
+        
+        return step;
+    }
+    
+    int minSteps(int m, int n, int d) {
+        
+        // If not possible
+        if (d > max(m, n) || d % gcd(m, n) != 0)
+            return -1;
+        
+        // Try both ways
+        return min(pour(m, n, d), pour(n, m, d));
+    }
+};
