@@ -1,0 +1,32 @@
+class Solution {
+public:
+    vector<int> reducePairs(vector<int>& arr) {
+        vector<int> st;
+
+        for (int x : arr) {
+            int curr = x;
+
+            while (!st.empty() && (st.back() * curr < 0)) { // opposite signs
+                if (abs(st.back()) > abs(curr)) {
+                    curr = st.back();   // keep stack top
+                    st.pop_back();
+                }
+                else if (abs(st.back()) < abs(curr)) {
+                    st.pop_back();      // keep curr
+                }
+                else {
+                    // equal absolute values → both removed
+                    st.pop_back();
+                    curr = 0;
+                    break;
+                }
+            }
+
+            if (curr != 0) {
+                st.push_back(curr);
+            }
+        }
+
+        return st;
+    }
+};
