@@ -1,0 +1,35 @@
+class Solution {
+public:
+    vector<int> commonElements(vector<int> &a, vector<int> &b, vector<int> &c) {
+        int i = 0, j = 0, k = 0;
+        int n1 = a.size(), n2 = b.size(), n3 = c.size();
+
+        vector<int> ans;
+
+        while (i < n1 && j < n2 && k < n3) {
+            
+            // If all three are equal
+            if (a[i] == b[j] && b[j] == c[k]) {
+                
+                // avoid duplicate in answer
+                if (ans.empty() || ans.back() != a[i]) {
+                    ans.push_back(a[i]);
+                }
+
+                i++;
+                j++;
+                k++;
+            }
+            else {
+                int mn = min({a[i], b[j], c[k]});
+
+                // move all pointers having minimum value
+                while (i < n1 && a[i] == mn) i++;
+                while (j < n2 && b[j] == mn) j++;
+                while (k < n3 && c[k] == mn) k++;
+            }
+        }
+
+        return ans;
+    }
+};
