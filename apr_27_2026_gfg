@@ -1,0 +1,35 @@
+class Solution {
+public:
+    int smallestSubstring(string s) {
+        int n = s.size();
+        vector<int> freq(3, 0);
+
+        int left = 0;
+        int count = 0;
+        int ans = INT_MAX;
+
+        for (int right = 0; right < n; right++) {
+            int idx = s[right] - '0';
+
+            if (freq[idx] == 0)
+                count++;
+
+            freq[idx]++;
+
+            // shrink while valid
+            while (count == 3) {
+                ans = min(ans, right - left + 1);
+
+                int leftIdx = s[left] - '0';
+                freq[leftIdx]--;
+
+                if (freq[leftIdx] == 0)
+                    count--;
+
+                left++;
+            }
+        }
+
+        return (ans == INT_MAX ? -1 : ans);
+    }
+};
