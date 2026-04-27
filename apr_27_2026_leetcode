@@ -1,0 +1,53 @@
+class Solution {
+public:
+    bool hasValidPath(vector<vector<int>>& grid) {
+        int m = grid.size();
+        int n = grid[0].size();
+
+        // street -> allowed directions
+        unordered_map<int, vector<pair<int,int>>> dir = {
+            {1, {{0,-1}, {0,1}}},   // left, right
+            {2, {{-1,0}, {1,0}}},   // up, down
+            {3, {{0,-1}, {1,0}}},   // left, down
+            {4, {{0,1}, {1,0}}},    // right, down
+            {5, {{0,-1}, {-1,0}}},  // left, up
+            {6, {{0,1}, {-1,0}}}    // right, up
+        };
+
+        vector<vector<int>> vis(m, vector<int>(n, 0));
+        queue<pair<int,int>> q;
+
+        q.push({0,0});
+        vis[0][0] = 1;
+
+        while (!q.empty()) {
+            auto [x,y] = q.front();
+            q.pop();
+
+            if (x == m-1 && y == n-1)
+                return true;
+
+            for (auto &[dx,dy] : dir[grid[x][y]]) {
+                int nx = x + dx;
+                int ny = y + dy;
+
+                if (nx < 0 || ny < 0 || nx >= m || ny >= n)
+                    continue;
+
+                if (vis[nx][ny])
+                    continue;
+
+                // check reverse connection from neighbor
+                for (auto &[rdx,rdy] : dir[grid[nx][ny]]) {
+                    if (nx + rdx == x && ny + rdy == y) {
+                        vis[nx][ny] = 1;
+                        q.push({nx, ny});
+                        break;
+                    }
+                }
+            }
+        }
+
+        return false;
+    }
+};
