@@ -1,0 +1,33 @@
+class Solution {
+public:
+    int minSwaps(vector<int>& arr) {
+        int n = arr.size();
+
+        int ones = 0;
+        for (int x : arr) {
+            if (x == 1) ones++;
+        }
+
+        // no 1s present
+        if (ones == 0) return -1;
+
+        int zeros = 0;
+
+        // first window
+        for (int i = 0; i < ones; i++) {
+            if (arr[i] == 0) zeros++;
+        }
+
+        int ans = zeros;
+
+        // sliding window
+        for (int i = ones; i < n; i++) {
+            if (arr[i - ones] == 0) zeros--; // outgoing
+            if (arr[i] == 0) zeros++;        // incoming
+
+            ans = min(ans, zeros);
+        }
+
+        return ans;
+    }
+};
