@@ -1,0 +1,29 @@
+class Solution {
+public:
+    vector<int> kthLargest(vector<int>& arr, int k) {
+        priority_queue<int, vector<int>, greater<int>> pq;
+        vector<int> ans;
+
+        for (int x : arr) {
+            // fill heap until size k
+            if (pq.size() < k) {
+                pq.push(x);
+            }
+            else {
+                // maintain top k largest
+                if (x > pq.top()) {
+                    pq.pop();
+                    pq.push(x);
+                }
+            }
+
+            // kth largest exists only if heap size == k
+            if (pq.size() < k)
+                ans.push_back(-1);
+            else
+                ans.push_back(pq.top());
+        }
+
+        return ans;
+    }
+};
