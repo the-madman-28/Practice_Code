@@ -1,0 +1,47 @@
+class Solution {
+public:
+
+    bool isPalindrome(string &s) {
+        int i = 0, j = s.size() - 1;
+        while (i < j) {
+            if (s[i++] != s[j--]) return false;
+        }
+        return true;
+    }
+
+    bool palindromePair(vector<string>& arr) {
+        unordered_map<string, int> mp;
+
+        // store reversed strings
+        for (int i = 0; i < arr.size(); i++) {
+            string rev = arr[i];
+            reverse(rev.begin(), rev.end());
+            mp[rev] = i;
+        }
+
+        for (int i = 0; i < arr.size(); i++) {
+            string s = arr[i];
+
+            for (int cut = 0; cut <= s.size(); cut++) {
+                string left = s.substr(0, cut);
+                string right = s.substr(cut);
+
+                // Case 1: left palindrome
+                if (isPalindrome(left)) {
+                    if (mp.count(right) && mp[right] != i) {
+                        return true;
+                    }
+                }
+
+                // Case 2: right palindrome
+                if (!right.empty() && isPalindrome(right)) {
+                    if (mp.count(left) && mp[left] != i) {
+                        return true;
+                    }
+                }
+            }
+        }
+
+        return false;
+    }
+};
