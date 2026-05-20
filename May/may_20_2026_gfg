@@ -1,0 +1,29 @@
+class Solution {
+public:
+    bool isProduct(vector<int>& arr, long long target) {
+
+        unordered_set<long long> st;
+
+        for (long long x : arr) {
+
+            // Handle zero separately
+            if (x == 0) {
+                if (target == 0) return true;
+                continue;
+            }
+
+            // target must be divisible by x
+            if (target % x == 0) {
+                long long y = target / x;
+
+                if (st.count(y)) {
+                    return true;
+                }
+            }
+
+            st.insert(x);
+        }
+
+        return false;
+    }
+};
