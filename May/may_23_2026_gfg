@@ -1,0 +1,41 @@
+/* Structure for Tree Node
+class Node {
+public:
+    int data;
+    Node* left;
+    Node* right;
+
+    Node(int val) {
+        data = val;
+        left = nullptr;
+        right = nullptr;
+    }
+};
+*/
+
+class Solution {
+public:
+
+    int solve(Node* root) {
+
+        if (root == NULL)
+            return 0;
+
+        // Store original value
+        int oldVal = root->data;
+
+        // Get subtree sums
+        int leftSum = solve(root->left);
+        int rightSum = solve(root->right);
+
+        // Update current node
+        root->data = leftSum + rightSum;
+
+        // Return original subtree sum
+        return oldVal + leftSum + rightSum;
+    }
+
+    void toSumTree(Node *root) {
+        solve(root);
+    }
+};
