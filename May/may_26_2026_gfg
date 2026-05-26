@@ -1,0 +1,40 @@
+class Solution {
+  public:
+    int minToggle(vector<int>& arr) {
+        
+        int n = arr.size();
+        
+        vector<int> prefixOnes(n + 1, 0);
+        vector<int> suffixZeros(n + 1, 0);
+        
+        // prefixOnes[i] = number of 1s in [0 ... i-1]
+        for(int i = 0; i < n; i++) {
+            prefixOnes[i + 1] = prefixOnes[i] + (arr[i] == 1);
+        }
+        
+        // suffixZeros[i] = number of 0s in [i ... n-1]
+        for(int i = n - 1; i >= 0; i--) {
+            suffixZeros[i] = suffixZeros[i + 1] + (arr[i] == 0);
+        }
+        
+        int ans = INT_MAX;
+        
+        // partition at every index
+        for(int i = 0; i <= n; i++) {
+            
+            // left side should be all 0s
+            // so toggle all 1s on left
+            
+            int leftToggles = prefixOnes[i];
+            
+            // right side should be all 1s
+            // so toggle all 0s on right
+            
+            int rightToggles = suffixZeros[i];
+            
+            ans = min(ans, leftToggles + rightToggles);
+        }
+        
+        return ans;
+    }
+};
