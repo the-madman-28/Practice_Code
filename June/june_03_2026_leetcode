@@ -1,0 +1,121 @@
+class Solution {
+public:
+    int earliestFinishTime(vector<int>& landStartTime,
+                           vector<int>& landDuration,
+                           vector<int>& waterStartTime,
+                           vector<int>& waterDuration) {
+
+        int n = landStartTime.size();
+        int m = waterStartTime.size();
+
+        long long ans = LLONG_MAX;
+
+        // ---------- Water preprocessing ----------
+        vector<pair<int,int>> water;
+        for (int i = 0; i < m; i++) {
+            water.push_back({waterStartTime[i], waterDuration[i]});
+        }
+
+        sort(water.begin(), water.end());
+
+        vector<int> wStart(m);
+        vector<long long> prefMinDurW(m);
+        vector<long long> suffMinStartPlusDurW(m);
+
+        for (int i = 0; i < m; i++) {
+            wStart[i] = water[i].first;
+
+            prefMinDurW[i] = water[i].second;
+            if (i)
+                prefMinDurW[i] = min(prefMinDurW[i],
+                                     prefMinDurW[i - 1]);
+        }
+
+        for (int i = m - 1; i >= 0; i--) {
+            suffMinStartPlusDurW[i] =
+                1LL * water[i].first + water[i].second;
+
+            if (i + 1 < m)
+                suffMinStartPlusDurW[i] =
+                    min(suffMinStartPlusDurW[i],
+                        suffMinStartPlusDurW[i + 1]);
+        }
+
+        // Land -> Water
+        for (int i = 0; i < n; i++) {
+
+            long long landFinish =
+                1LL * landStartTime[i] + landDuration[i];
+
+            int pos = upper_bound(wStart.begin(), wStart.end(),
+                                  landFinish) - wStart.begin();
+
+            // waterStart <= landFinish
+            if (pos > 0) {
+                ans = min(ans,
+                          landFinish + prefMinDurW[pos - 1]);
+            }
+
+            // waterStart > landFinish
+            if (pos < m) {
+                ans = min(ans,
+                          suffMinStartPlusDurW[pos]);
+            }
+        }
+
+        // ---------- Land preprocessing ----------
+        vector<pair<int,int>> land;
+        for (int i = 0; i < n; i++) {
+            land.push_back({landStartTime[i], landDuration[i]});
+        }
+
+        sort(land.begin(), land.end());
+
+        vector<int> lStart(n);
+        vector<long long> prefMinDurL(n);
+        vector<long long> suffMinStartPlusDurL(n);
+
+        for (int i = 0; i < n; i++) {
+            lStart[i] = land[i].first;
+
+            prefMinDurL[i] = land[i].second;
+            if (i)
+                prefMinDurL[i] = min(prefMinDurL[i],
+                                     prefMinDurL[i - 1]);
+        }
+
+        for (int i = n - 1; i >= 0; i--) {
+            suffMinStartPlusDurL[i] =
+                1LL * land[i].first + land[i].second;
+
+            if (i + 1 < n)
+                suffMinStartPlusDurL[i] =
+                    min(suffMinStartPlusDurL[i],
+                        suffMinStartPlusDurL[i + 1]);
+        }
+
+        // Water -> Land
+        for (int j = 0; j < m; j++) {
+
+            long long waterFinish =
+                1LL * waterStartTime[j] + waterDuration[j];
+
+            int pos = upper_bound(lStart.begin(), lStart.end(),
+                                  waterFinish) - lStart.begin();
+
+            // landStart <= waterFinish
+            if (pos > 0) {
+                ans = min(ans,
+                          waterFinish + prefMinDurL[pos - 1]);
+            }
+
+            // landStart > waterFinish
+            if (pos < n) {
+                ans = min(ans,
+                          suffMinStartPlusDurL[pos]);
+            }
+        }
+
+        return (int)ans;
+    }
+};
