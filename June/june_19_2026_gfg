@@ -1,0 +1,29 @@
+class Solution {
+  public:
+    vector<int> optimalArray(vector<int> &arr) {
+
+        int n = arr.size();
+        vector<int> ans(n);
+        vector<long long> pref(n + 1, 0);
+
+        for (int i = 0; i < n; i++)
+            pref[i + 1] = pref[i] + arr[i];
+
+        for (int i = 0; i < n; i++) {
+
+            int m = i / 2;
+            long long x = arr[m];
+
+            long long left =
+                x * (m + 1LL) - pref[m + 1];
+
+            long long right =
+                (pref[i + 1] - pref[m + 1]) -
+                x * (i - m);
+
+            ans[i] = left + right;
+        }
+
+        return ans;
+    }
+};
