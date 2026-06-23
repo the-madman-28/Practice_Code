@@ -1,0 +1,65 @@
+class Solution {
+public:
+    static constexpr int MOD = 1e9 + 7;
+
+    int zigZagArrays(int n, int l, int r) {
+        int m = r - l + 1;
+
+        // Length = 1
+        if (n == 1) return m;
+
+        // Only one distinct value available
+        if (m == 1) return 0;
+
+        // DP arrays
+        vector<int> up(m + 2), down(m + 2);
+        vector<int> nup(m + 2), ndown(m + 2);
+        vector<int> prefUp(m + 2), prefDown(m + 2);
+
+        // Length = 2
+        for (int v = 1; v <= m; v++) {
+            up[v] = v - 1;     // previous value < v
+            down[v] = m - v;   // previous value > v
+        }
+
+        if (n == 2) {
+            return (1LL * m * (m - 1)) % MOD;
+        }
+
+        // Build lengths 3...n
+        for (int len = 3; len <= n; len++) {
+
+            prefUp[0] = prefDown[0] = 0;
+
+            for (int i = 1; i <= m; i++) {
+                prefUp[i] =
+                    (prefUp[i - 1] + up[i]) % MOD;
+
+                prefDown[i] =
+                    (prefDown[i - 1] + down[i]) % MOD;
+            }
+
+            int totalUp = prefUp[m];
+
+            for (int v = 1; v <= m; v++) {
+                // Last move becomes increasing
+                nup[v] = prefDown[v - 1];
+
+                // Last move becomes decreasing
+                ndown[v] =
+                    (totalUp - prefUp[v] + MOD) % MOD;
+            }
+
+            swap(up, nup);
+            swap(down, ndown);
+        }
+
+        long long ans = 0;
+
+        for (int v = 1; v <= m; v++) {
+            ans = (ans + up[v] + down[v]) % MOD;
+        }
+
+        return (int)ans;
+    }
+};
