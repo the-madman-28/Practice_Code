@@ -1,0 +1,80 @@
+class Solution {
+public:
+    vector<int> sumAndMultiply(string s, vector<vector<int>>& queries) {
+        const long long MOD = 1000000007;
+
+        int n = s.size();
+
+        // cnt[i] = number of non-zero digits in s[0...i-1]
+        vector<int> cnt(n + 1, 0);
+
+        vector<int> digits;
+
+        for (int i = 0; i < n; i++) {
+            cnt[i + 1] = cnt[i];
+
+            if (s[i] != '0') {
+                digits.push_back(s[i] - '0');
+                cnt[i + 1]++;
+            }
+        }
+
+        int k = digits.size();
+
+        // powers of 10
+        vector<long long> power10(k + 1, 1);
+
+        for (int i = 1; i <= k; i++) {
+            power10[i] = (power10[i - 1] * 10) % MOD;
+        }
+
+        // prefix number modulo MOD
+        vector<long long> prefNum(k + 1, 0);
+
+        // prefix digit sum
+        vector<long long> prefSum(k + 1, 0);
+
+        for (int i = 0; i < k; i++) {
+            prefNum[i + 1] =
+                (prefNum[i] * 10 + digits[i]) % MOD;
+
+            prefSum[i + 1] =
+                prefSum[i] + digits[i];
+        }
+
+        vector<int> answer;
+
+        for (auto &q : queries) {
+            int l = q[0];
+            int r = q[1];
+
+            // Corresponding range in compressed digits
+            int left = cnt[l];
+            int right = cnt[r + 1];
+
+            int len = right - left;
+
+            if (len == 0) {
+                answer.push_back(0);
+                continue;
+            }
+
+            // Extract concatenated number
+            long long x =
+                (prefNum[right]
+                - prefNum[left] * power10[len] % MOD
+                + MOD) % MOD;
+
+            // Extract digit sum
+            long long sum =
+                prefSum[right] - prefSum[left];
+
+            long long result =
+                (x * (sum % MOD)) % MOD;
+
+            answer.push_back(result);
+        }
+
+        return answer;
+    }
+};
