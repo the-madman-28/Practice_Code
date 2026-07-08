@@ -1,0 +1,88 @@
+class Solution {
+  public:
+    int n, m;
+    
+    int dx[4] = {-1, 1, 0, 0};
+    int dy[4] = {0, 0, -1, 1};
+
+    void bfs(vector<vector<int>>& mat,
+             queue<pair<int, int>>& q,
+             vector<vector<bool>>& visited) {
+        
+        while (!q.empty()) {
+            auto [x, y] = q.front();
+            q.pop();
+
+            for (int k = 0; k < 4; k++) {
+                int nx = x + dx[k];
+                int ny = y + dy[k];
+
+                if (nx >= 0 && nx < n &&
+                    ny >= 0 && ny < m &&
+                    !visited[nx][ny] &&
+                    mat[nx][ny] >= mat[x][y]) {
+                    
+                    visited[nx][ny] = true;
+                    q.push({nx, ny});
+                }
+            }
+        }
+    }
+
+    int countCoordinates(vector<vector<int>>& mat) {
+        n = mat.size();
+        m = mat[0].size();
+
+        vector<vector<bool>> reachP(
+            n, vector<bool>(m, false)
+        );
+
+        vector<vector<bool>> reachQ(
+            n, vector<bool>(m, false)
+        );
+
+        queue<pair<int, int>> qP;
+        queue<pair<int, int>> qQ;
+
+        // Top and bottom boundaries
+        for (int j = 0; j < m; j++) {
+            if (!reachP[0][j]) {
+                reachP[0][j] = true;
+                qP.push({0, j});
+            }
+
+            if (!reachQ[n - 1][j]) {
+                reachQ[n - 1][j] = true;
+                qQ.push({n - 1, j});
+            }
+        }
+
+        // Left and right boundaries
+        for (int i = 0; i < n; i++) {
+            if (!reachP[i][0]) {
+                reachP[i][0] = true;
+                qP.push({i, 0});
+            }
+
+            if (!reachQ[i][m - 1]) {
+                reachQ[i][m - 1] = true;
+                qQ.push({i, m - 1});
+            }
+        }
+
+        bfs(mat, qP, reachP);
+        bfs(mat, qQ, reachQ);
+
+        int count = 0;
+
+        for (int i = 0; i < n; i++) {
+            for (int j = 0; j < m; j++) {
+                if (reachP[i][j] && reachQ[i][j]) {
+                    count++;
+                }
+            }
+        }
+
+        return count;
+    }
+};
