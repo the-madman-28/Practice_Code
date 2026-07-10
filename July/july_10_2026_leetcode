@@ -1,0 +1,136 @@
+class Solution {
+public:
+    vector<int> pathExistenceQueries(
+        int n,
+        vector<int>& nums,
+        int maxDiff,
+        vector<vector<int>>& queries
+    ) {
+        // {value, original index}
+        vector<pair<int, int>> nodes;
+
+        for (int i = 0; i < n; i++) {
+            nodes.push_back({nums[i], i});
+        }
+
+        sort(nodes.begin(), nodes.end());
+
+        // Sorted values
+        vector<int> val(n);
+
+        // pos[original index] = position in sorted array
+        vector<int> pos(n);
+
+        for (int i = 0; i < n; i++) {
+            val[i] = nodes[i].first;
+            pos[nodes[i].second] = i;
+        }
+
+        // -----------------------------------
+        // Find connected components
+        // -----------------------------------
+        vector<int> component(n);
+        component[0] = 0;
+
+        for (int i = 1; i < n; i++) {
+            component[i] = component[i - 1];
+
+            if (val[i] - val[i - 1] > maxDiff) {
+                component[i]++;
+            }
+        }
+
+        // -----------------------------------
+        // next[i] = farthest position reachable
+        //           from i in one edge
+        // -----------------------------------
+        vector<int> nxt(n);
+
+        int r = 0;
+
+        for (int i = 0; i < n; i++) {
+            if (r < i) {
+                r = i;
+            }
+
+            while (r + 1 < n &&
+                   val[r + 1] - val[i] <= maxDiff) {
+                r++;
+            }
+
+            nxt[i] = r;
+        }
+
+        // -----------------------------------
+        // Binary lifting table
+        // up[j][i] = farthest position reachable
+        //            using 2^j edges
+        // -----------------------------------
+        int LOG = 1;
+
+        while ((1 << LOG) <= n) {
+            LOG++;
+        }
+
+        vector<vector<int>> up(
+            LOG,
+            vector<int>(n)
+        );
+
+        for (int i = 0; i < n; i++) {
+            up[0][i] = nxt[i];
+        }
+
+        for (int j = 1; j < LOG; j++) {
+            for (int i = 0; i < n; i++) {
+                up[j][i] =
+                    up[j - 1][up[j - 1][i]];
+            }
+        }
+
+        // -----------------------------------
+        // Process queries
+        // -----------------------------------
+        vector<int> answer;
+
+        for (auto &q : queries) {
+            int u = q[0];
+            int v = q[1];
+
+            if (u == v) {
+                answer.push_back(0);
+                continue;
+            }
+
+            int left = pos[u];
+            int right = pos[v];
+
+            if (left > right) {
+                swap(left, right);
+            }
+
+            // Different components => no path
+            if (component[left] != component[right]) {
+                answer.push_back(-1);
+                continue;
+            }
+
+            int current = left;
+            int jumps = 0;
+
+            // Take maximum jumps while
+            // still staying before right
+            for (int j = LOG - 1; j >= 0; j--) {
+                if (up[j][current] < right) {
+                    current = up[j][current];
+                    jumps += (1 << j);
+                }
+            }
+
+            // One final jump reaches right
+            answer.push_back(jumps + 1);
+        }
+
+        return answer;
+    }
+};
