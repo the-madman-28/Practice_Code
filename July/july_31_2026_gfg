@@ -1,0 +1,73 @@
+class Solution {
+public:
+    static const int MOD = 1e9 + 7;
+
+    int countSubsets(vector<int> &arr) {
+
+        vector<int> primes = {2,3,5,7,11,13,17,19,23,29};
+
+        vector<int> freq(31,0);
+
+        for(int x:arr)
+            freq[x]++;
+
+        vector<long long> dp(1<<10,0);
+        dp[0]=1;
+
+        for(int num=2;num<=30;num++){
+
+            if(freq[num]==0) continue;
+
+            int x=num;
+            int mask=0;
+            bool ok=true;
+
+            for(int i=0;i<10;i++){
+
+                int p=primes[i];
+                int cnt=0;
+
+                while(x%p==0){
+                    cnt++;
+                    x/=p;
+                }
+
+                if(cnt>1){
+                    ok=false;
+                    break;
+                }
+
+                if(cnt==1)
+                    mask|=(1<<i);
+            }
+
+            if(!ok) continue;
+
+            vector<long long> ndp(dp);
+
+            for(int s=0;s<(1<<10);s++){
+
+                if((s&mask)==0){
+
+                    ndp[s|mask]=(ndp[s|mask]+dp[s]*freq[num])%MOD;
+                }
+            }
+
+            dp.swap(ndp);
+        }
+
+        long long ans=0;
+
+        for(int mask=1;mask<(1<<10);mask++)
+            ans=(ans+dp[mask])%MOD;
+
+        long long ways=1;
+
+        while(freq[1]--)
+            ways=(ways*2)%MOD;
+
+        ans=(ans*ways)%MOD;
+
+        return ans;
+    }
+};
