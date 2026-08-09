@@ -1,0 +1,52 @@
+class Solution {
+public:
+    int zigzagSequence(vector<vector<int>>& mat) {
+        int n = mat.size();
+
+        vector<int> dp(n);
+
+        // First row: sequence can start from any column.
+        for (int j = 0; j < n; j++) {
+            dp[j] = mat[0][j];
+        }
+
+        for (int i = 1; i < n; i++) {
+
+            // Find largest and second largest values
+            // in the previous row.
+            int best1 = -1;
+            int best2 = -1;
+            int bestCol = -1;
+
+            for (int j = 0; j < n; j++) {
+                if (dp[j] > best1) {
+                    best2 = best1;
+                    best1 = dp[j];
+                    bestCol = j;
+                } 
+                else if (dp[j] > best2) {
+                    best2 = dp[j];
+                }
+            }
+
+            vector<int> ndp(n);
+
+            for (int j = 0; j < n; j++) {
+
+                // We cannot come from the same column.
+                int previous;
+
+                if (j != bestCol)
+                    previous = best1;
+                else
+                    previous = best2;
+
+                ndp[j] = mat[i][j] + previous;
+            }
+
+            dp = ndp;
+        }
+
+        return *max_element(dp.begin(), dp.end());
+    }
+};
