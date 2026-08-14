@@ -1,0 +1,32 @@
+class Solution {
+public:
+    bool isPossible(vector<int>& arr, int s, int x) {
+        vector<long long> paper;
+
+        long long sum = s;
+        paper.push_back(s);
+
+        for (int i = 0; i < arr.size(); i++) {
+            long long next = sum + arr[i];
+
+            // Values larger than x can never be part
+            // of a subset whose sum is x.
+            if (next > x)
+                break;
+
+            paper.push_back(next);
+            sum += next;
+        }
+
+        // Greedily use the largest possible values.
+        long long remaining = x;
+
+        for (int i = paper.size() - 1; i >= 0; i--) {
+            if (paper[i] <= remaining) {
+                remaining -= paper[i];
+            }
+        }
+
+        return remaining == 0;
+    }
+};
