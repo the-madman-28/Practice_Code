@@ -1,0 +1,44 @@
+class Solution {
+public:
+    int minProd(vector<int>& arr) {
+        int negCount = 0;
+        int closestNegative = INT_MIN;
+        int smallestPositive = INT_MAX;
+        bool hasZero = false;
+
+        long long product = 1;
+
+        for (int x : arr) {
+            if (x == 0) {
+                hasZero = true;
+                continue;
+            }
+
+            product *= x;
+
+            if (x < 0) {
+                negCount++;
+                closestNegative = max(closestNegative, x);
+            } 
+            else {
+                smallestPositive = min(smallestPositive, x);
+            }
+        }
+
+        // No negative numbers
+        if (negCount == 0) {
+            return hasZero ? 0 : smallestPositive;
+        }
+
+        // Odd number of negatives -> all non-zero elements
+        if (negCount % 2 == 1) {
+            return product;
+        }
+
+        // Even number of negatives -> remove
+        // the negative closest to zero.
+        product /= closestNegative;
+
+        return product;
+    }
+};
