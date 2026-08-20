@@ -1,0 +1,41 @@
+/* Structure of Binary Tree Node
+class Node {
+  public:
+    int data;
+    Node *left;
+    Node *right;
+    Node(int val) {
+        data = val;
+        left = right = nullptr;
+    }
+};*/
+
+class Solution {
+public:
+    int solve(Node* root, int &ans) {
+        if (root == nullptr)
+            return INT_MAX;
+
+        // Find minimum value in left and right subtrees
+        int leftMin = solve(root->left, ans);
+        int rightMin = solve(root->right, ans);
+
+        int minDescendant = min(leftMin, rightMin);
+
+        // Only calculate if this node has a descendant
+        if (minDescendant != INT_MAX) {
+            ans = max(ans, root->data - minDescendant);
+        }
+
+        // Minimum value in this subtree
+        return min(root->data, minDescendant);
+    }
+
+    int maxDiff(Node* root) {
+        int ans = INT_MIN;
+
+        solve(root, ans);
+
+        return ans;
+    }
+};
