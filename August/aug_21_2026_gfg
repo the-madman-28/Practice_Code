@@ -1,0 +1,43 @@
+class Solution {
+public:
+    int transform(string &s1, string &s2) {
+        int n = s1.size();
+
+        if (n != s2.size())
+            return -1;
+
+        // Both strings must contain the same characters.
+        int freq[256] = {0};
+
+        for (char c : s1)
+            freq[(unsigned char)c]++;
+
+        for (char c : s2)
+            freq[(unsigned char)c]--;
+
+        for (int i = 0; i < 256; i++) {
+            if (freq[i] != 0)
+                return -1;
+        }
+
+        // Find the longest suffix of s2
+        // that is a subsequence of s1.
+        int i = n - 1;
+        int j = n - 1;
+
+        int keep = 0;
+
+        while (i >= 0 && j >= 0) {
+            if (s1[i] == s2[j]) {
+                keep++;
+                j--;
+            }
+
+            i--;
+        }
+
+        // If we could not match all of s2, that's okay.
+        // The matched part is the longest suffix we can keep.
+        return n - keep;
+    }
+};
