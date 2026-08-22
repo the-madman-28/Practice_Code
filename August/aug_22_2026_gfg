@@ -1,0 +1,107 @@
+/* Structure of Binary Tree Node
+class Node {
+  public:
+    int data;
+    Node *left;
+    Node *right;
+
+    Node(int val) {
+        data = val;
+        left = right = nullptr;
+    }
+}; */
+
+class Solution {
+public:
+
+    bool findPath(Node* root, int target, string& path) {
+        if (root == nullptr)
+            return false;
+
+        if (root->data == target)
+            return true;
+
+        // Go left
+        path.push_back('L');
+
+        if (findPath(root->left, target, path))
+            return true;
+
+        path.pop_back();
+
+        // Go right
+        path.push_back('R');
+
+        if (findPath(root->right, target, path))
+            return true;
+
+        path.pop_back();
+
+        return false;
+    }
+
+    int countTurns(string& path) {
+        int turns = 0;
+
+        for (int i = 1; i < path.size(); i++) {
+            if (path[i] != path[i - 1])
+                turns++;
+        }
+
+        return turns;
+    }
+
+    int numberOfTurns(Node* root, int p, int q) {
+        string pathP, pathQ;
+
+        // Find root -> p path
+        if (!findPath(root, p, pathP))
+            return -1;
+
+        // Find root -> q path
+        if (!findPath(root, q, pathQ))
+            return -1;
+
+        // Find where the two paths diverge.
+        int i = 0;
+
+        while (i < pathP.size() &&
+               i < pathQ.size() &&
+               pathP[i] == pathQ[i]) {
+            i++;
+        }
+
+        int turns = 0;
+
+        /*
+            Count turns in the part from LCA -> p
+        */
+        for (int j = i + 1; j < pathP.size(); j++) {
+            if (pathP[j] != pathP[j - 1])
+                turns++;
+        }
+
+        /*
+            Count turns in the part from LCA -> q
+        */
+        for (int j = i + 1; j < pathQ.size(); j++) {
+            if (pathQ[j] != pathQ[j - 1])
+                turns++;
+        }
+
+        /*
+            If p and q are in different branches of the LCA,
+            there is one additional turn at the LCA.
+        */
+        if (i < pathP.size() && i < pathQ.size()) {
+            if (pathP[i] != pathQ[i])
+                turns++;
+        }
+
+        // No turns -> problem asks for -1
+        if (turns == 0)
+            return -1;
+
+        return turns;
+    }
+};
