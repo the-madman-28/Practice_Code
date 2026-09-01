@@ -1,0 +1,34 @@
+class Solution {
+public:
+    static const int MOD = 1000000007;
+
+    int palindromicStrings(int n, int k) {
+        long long ans = 0;
+        long long perm = 1; // P(k, 0)
+
+        for (int m = 0; ; m++) {
+            // Odd length = 2*m + 1
+            int oddLen = 2 * m + 1;
+            if (oddLen <= n && m < k) {
+                ans = (ans + perm * (k - m)) % MOD;
+            }
+
+            // Prepare P(k, m+1)
+            if (m >= k)
+                break;
+
+            perm = (perm * (k - m)) % MOD;
+
+            // Even length = 2*(m+1)
+            int evenLen = 2 * (m + 1);
+            if (evenLen <= n) {
+                ans = (ans + perm) % MOD;
+            }
+
+            if (oddLen > n && evenLen > n)
+                break;
+        }
+
+        return ans;
+    }
+};
