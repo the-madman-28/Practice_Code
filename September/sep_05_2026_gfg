@@ -1,0 +1,20 @@
+class Solution {
+  public:
+    int longestSubseq(vector<int>& arr) {
+        const int MAX_VAL = 1000000 + 2;
+        vector<int> dp(MAX_VAL + 2, 0);
+
+        int ans = 0;
+
+        for (int x : arr) {
+            int curr = 1 + max(dp[x - 1], dp[x + 1]);
+
+            // Important: don't overwrite a better existing subsequence
+            dp[x] = max(dp[x], curr);
+
+            ans = max(ans, dp[x]);
+        }
+
+        return ans;
+    }
+};
