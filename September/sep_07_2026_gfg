@@ -1,0 +1,53 @@
+class Solution {
+  public:
+    int minCount(vector<int>& arr) {
+        int n = arr.size();
+        const int MAXV = 101;
+        const int INF = 101;
+
+        // dp[incLast][decLast] = maximum selected elements
+        vector<vector<int>> dp(102, vector<int>(102, -1));
+
+        // Initially both subsequences are empty
+        dp[0][INF] = 0;
+
+        for (int x : arr) {
+            auto next = dp; // skipping x
+
+            for (int inc = 0; inc <= 101; inc++) {
+                for (int dec = 0; dec <= 101; dec++) {
+                    if (dp[inc][dec] == -1)
+                        continue;
+
+                    // Put x in strictly increasing subsequence
+                    if (x > inc) {
+                        next[x][dec] = max(
+                            next[x][dec],
+                            dp[inc][dec] + 1
+                        );
+                    }
+
+                    // Put x in strictly decreasing subsequence
+                    if (x < dec) {
+                        next[inc][x] = max(
+                            next[inc][x],
+                            dp[inc][dec] + 1
+                        );
+                    }
+                }
+            }
+
+            dp = next;
+        }
+
+        int maxSelected = 0;
+
+        for (int inc = 0; inc <= 101; inc++) {
+            for (int dec = 0; dec <= 101; dec++) {
+                maxSelected = max(maxSelected, dp[inc][dec]);
+            }
+        }
+
+        return n - maxSelected;
+    }
+};
