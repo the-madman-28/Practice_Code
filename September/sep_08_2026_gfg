@@ -1,0 +1,57 @@
+class Solution {
+public:
+    bool found(vector<vector<char>>& mat, string& word,
+               int row, int col, int dx, int dy) {
+
+        int n = mat.size();
+        int m = mat[0].size();
+
+        for (int k = 0; k < word.size(); k++) {
+            int nr = row + k * dx;
+            int nc = col + k * dy;
+
+            // Out of bounds
+            if (nr < 0 || nr >= n || nc < 0 || nc >= m)
+                return false;
+
+            if (mat[nr][nc] != word[k])
+                return false;
+        }
+
+        return true;
+    }
+
+    vector<vector<int>> searchWord(vector<vector<char>>& mat, string word) {
+        int n = mat.size();
+        int m = mat[0].size();
+
+        vector<vector<int>> ans;
+
+        // 8 possible directions
+        int dx[] = {-1, -1, -1, 0, 0, 1, 1, 1};
+        int dy[] = {-1, 0, 1, -1, 1, -1, 0, 1};
+
+        for (int i = 0; i < n; i++) {
+            for (int j = 0; j < m; j++) {
+
+                if (mat[i][j] != word[0])
+                    continue;
+
+                bool exists = false;
+
+                for (int dir = 0; dir < 8; dir++) {
+                    if (found(mat, word, i, j, dx[dir], dy[dir])) {
+                        exists = true;
+                        break;
+                    }
+                }
+
+                if (exists) {
+                    ans.push_back({i, j});
+                }
+            }
+        }
+
+        return ans;
+    }
+};
