@@ -1,0 +1,39 @@
+class Solution {
+public:
+    int digitSum(int x) {
+        int sum = 0;
+        while (x) {
+            sum += x % 10;
+            x /= 10;
+        }
+        return sum;
+    }
+
+    int findMax(int n) {
+        int ans = n;
+        int best = digitSum(n);
+
+        string s = to_string(n);
+
+        for (int i = 0; i < s.size(); i++) {
+            if (s[i] == '0') continue;
+
+            string t = s;
+
+            t[i]--;
+
+            for (int j = i + 1; j < t.size(); j++)
+                t[j] = '9';
+
+            int candidate = stoi(t);
+            int sum = digitSum(candidate);
+
+            if (sum > best || (sum == best && candidate > ans)) {
+                best = sum;
+                ans = candidate;
+            }
+        }
+
+        return ans;
+    }
+};
