@@ -1,0 +1,25 @@
+class Solution {
+public:
+    int pairCount(int x, int y) {
+        if (y % x != 0)
+            return 0;
+
+        int m = y / x;
+        int ans = 0;
+
+        for (int d = 1; d * d <= m; d++) {
+            if (m % d == 0) {
+                int e = m / d;
+
+                if (__gcd(d, e) == 1) {
+                    if (d == e)
+                        ans += 1;
+                    else
+                        ans += 2;
+                }
+            }
+        }
+
+        return ans;
+    }
+};
