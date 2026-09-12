@@ -1,0 +1,30 @@
+class Solution {
+public:
+    int maxProduct(vector<int> &arr, int k) {
+        const long long INF = 1e18;
+
+        vector<long long> maxDP(k + 1, -INF);
+        vector<long long> minDP(k + 1, INF);
+
+        // Product of 0 selected elements = 1
+        maxDP[0] = minDP[0] = 1;
+
+        for (int x : arr) {
+
+            // Go backwards so each element is used only once
+            for (int j = min(k, (int)arr.size()); j >= 1; j--) {
+
+                if (maxDP[j - 1] == -INF)
+                    continue;
+
+                long long p1 = maxDP[j - 1] * x;
+                long long p2 = minDP[j - 1] * x;
+
+                maxDP[j] = max(maxDP[j], max(p1, p2));
+                minDP[j] = min(minDP[j], min(p1, p2));
+            }
+        }
+
+        return (int)maxDP[k];
+    }
+};
