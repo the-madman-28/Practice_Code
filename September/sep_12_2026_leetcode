@@ -1,0 +1,71 @@
+class Solution {
+public:
+    struct State {
+        long long score = 0;
+        vector<int> ids;
+    };
+
+    bool better(const State& a, const State& b) {
+        if (a.score != b.score)
+            return a.score > b.score;
+
+        return a.ids < b.ids;
+    }
+
+    vector<int> maximumWeight(vector<vector<int>>& intervals) {
+        int n = intervals.size();
+
+        vector<array<long long, 4>> v;
+
+        for (int i = 0; i < n; i++) {
+            v.push_back({
+                intervals[i][0],
+                intervals[i][1],
+                intervals[i][2],
+                i
+            });
+        }
+
+        sort(v.begin(), v.end());
+
+        vector<long long> starts(n);
+
+        for (int i = 0; i < n; i++)
+            starts[i] = v[i][0];
+
+        // First interval with start > current end
+        vector<int> next(n);
+
+        for (int i = 0; i < n; i++) {
+            next[i] = upper_bound(
+                starts.begin(),
+                starts.end(),
+                v[i][1]
+            ) - starts.begin();
+        }
+
+        vector<vector<State>> dp(n + 1, vector<State>(5));
+
+        for (int i = n - 1; i >= 0; i--) {
+            for (int k = 1; k <= 4; k++) {
+
+                // Skip
+                dp[i][k] = dp[i + 1][k];
+
+                // Take
+                State take = dp[next[i]][k - 1];
+
+                take.score += v[i][2];
+
+                // Insert original index in sorted order
+                take.ids.push_back((int)v[i][3]);
+                sort(take.ids.begin(), take.ids.end());
+
+                if (better(take, dp[i][k]))
+                    dp[i][k] = take;
+            }
+        }
+
+        return dp[0][4].ids;
+    }
+};
