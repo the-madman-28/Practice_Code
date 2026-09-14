@@ -1,0 +1,70 @@
+class Solution {
+public:
+    int shortestPath(vector<vector<int>> &mat) {
+        int n = mat.size();
+        int m = mat[0].size();
+
+        vector<vector<int>> safe = mat;
+
+        int dr[] = {-1, 1, 0, 0};
+        int dc[] = {0, 0, -1, 1};
+
+        // Mark landmines and their adjacent cells as unsafe
+        for (int i = 0; i < n; i++) {
+            for (int j = 0; j < m; j++) {
+
+                if (mat[i][j] == 0) {
+                    safe[i][j] = 0;
+
+                    for (int d = 0; d < 4; d++) {
+                        int ni = i + dr[d];
+                        int nj = j + dc[d];
+
+                        if (ni >= 0 && ni < n &&
+                            nj >= 0 && nj < m) {
+                            safe[ni][nj] = 0;
+                        }
+                    }
+                }
+            }
+        }
+
+        queue<pair<pair<int, int>, int>> q;
+
+        // Start from every safe cell in first column
+        for (int i = 0; i < n; i++) {
+            if (safe[i][0] == 1) {
+                q.push({{i, 0}, 1});
+                safe[i][0] = 0; // visited
+            }
+        }
+
+        while (!q.empty()) {
+            auto cur = q.front();
+            q.pop();
+
+            int r = cur.first.first;
+            int c = cur.first.second;
+            int dist = cur.second;
+
+            // Reached last column
+            if (c == m - 1)
+                return dist;
+
+            for (int d = 0; d < 4; d++) {
+                int nr = r + dr[d];
+                int nc = c + dc[d];
+
+                if (nr >= 0 && nr < n &&
+                    nc >= 0 && nc < m &&
+                    safe[nr][nc] == 1) {
+
+                    safe[nr][nc] = 0;
+                    q.push({{nr, nc}, dist + 1});
+                }
+            }
+        }
+
+        return -1;
+    }
+};
