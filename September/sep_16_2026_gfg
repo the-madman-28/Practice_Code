@@ -1,0 +1,35 @@
+class Solution {
+public:
+    int dominantPairs(vector<int> &arr) {
+        int n = arr.size();
+        int mid = n / 2;
+
+        // Sort the second half
+        vector<int> right(arr.begin() + mid, arr.end());
+        sort(right.begin(), right.end());
+
+        long long ans = 0;
+
+        // For every element in the first half,
+        // count y such that 5*y <= x
+        for (int i = 0; i < mid; i++) {
+            int x = arr[i];
+
+            int lo = 0, hi = right.size();
+
+            // Find first position where 5*right[pos] > x
+            while (lo < hi) {
+                int m = lo + (hi - lo) / 2;
+
+                if (5LL * right[m] <= x)
+                    lo = m + 1;
+                else
+                    hi = m;
+            }
+
+            ans += lo;
+        }
+
+        return (int)ans;
+    }
+};
