@@ -1,0 +1,133 @@
+class Solution {
+    struct Node {
+        int prod;
+        long long cnt[5];
+
+        Node() {
+            prod = 1;
+            for (int i = 0; i < 5; i++)
+                cnt[i] = 0;
+        }
+    };
+
+    int k;
+    int n;
+    vector<Node> seg;
+
+    Node mergeNode(const Node& A, const Node& B) {
+        Node res;
+
+        // Product of the complete segment
+        res.prod = (A.prod * B.prod) % k;
+
+        // Prefixes entirely inside A
+        for (int r = 0; r < k; r++) {
+            res.cnt[r] += A.cnt[r];
+        }
+
+        // Prefixes = entire A + a prefix of B
+        for (int r = 0; r < k; r++) {
+            int newRem = (A.prod * r) % k;
+            res.cnt[newRem] += B.cnt[r];
+        }
+
+        return res;
+    }
+
+    void build(int idx, int l, int r, vector<int>& nums) {
+        if (l == r) {
+            int val = nums[l] % k;
+
+            seg[idx].prod = val;
+            seg[idx].cnt[val] = 1;
+
+            return;
+        }
+
+        int mid = (l + r) / 2;
+
+        build(idx * 2, l, mid, nums);
+        build(idx * 2 + 1, mid + 1, r, nums);
+
+        seg[idx] = mergeNode(seg[idx * 2], seg[idx * 2 + 1]);
+    }
+
+    void update(int idx, int l, int r, int pos, int val) {
+        if (l == r) {
+            val %= k;
+
+            seg[idx] = Node();
+            seg[idx].prod = val;
+            seg[idx].cnt[val] = 1;
+
+            return;
+        }
+
+        int mid = (l + r) / 2;
+
+        if (pos <= mid) {
+            update(idx * 2, l, mid, pos, val);
+        } else {
+            update(idx * 2 + 1, mid + 1, r, pos, val);
+        }
+
+        seg[idx] = mergeNode(seg[idx * 2], seg[idx * 2 + 1]);
+    }
+
+    Node query(int idx, int l, int r, int ql, int qr) {
+        // Completely outside
+        if (qr < l || r < ql) {
+            return Node(); 
+        }
+
+        // Completely inside
+        if (ql <= l && r <= qr) {
+            return seg[idx];
+        }
+
+        int mid = (l + r) / 2;
+
+        Node left = query(idx * 2, l, mid, ql, qr);
+        Node right = query(idx * 2 + 1, mid + 1, r, ql, qr);
+
+        // If one side is empty, return the other side
+        if (ql > mid)
+            return right;
+
+        if (qr <= mid)
+            return left;
+
+        return mergeNode(left, right);
+    }
+
+public:
+    vector<int> resultArray(vector<int>& nums, int k,
+                            vector<vector<int>>& queries) {
+
+        this->k = k;
+        n = nums.size();
+
+        seg.resize(4 * n);
+
+        build(1, 0, n - 1, nums);
+
+        vector<int> result;
+
+        for (auto& q : queries) {
+            int index = q[0];
+            int value = q[1];
+            int start = q[2];
+            int x = q[3];
+
+            // Persistent point update
+            update(1, 0, n - 1, index, value);
+
+            // We need prefix products of nums[start ... n-1]
+            Node res = query(1, 0, n - 1, start, n - 1);
+
+            result.push_back((int)res.cnt[x]);
+        }
+
+        return result;
+    }
+};
