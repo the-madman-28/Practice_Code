@@ -1,0 +1,38 @@
+class Solution {
+public:
+    int formPyramid(vector<int>& arr) {
+        int n = arr.size();
+
+        vector<int> left(n), right(n);
+
+        // Maximum increasing height ending at i
+        left[0] = 1;
+
+        for (int i = 1; i < n; i++) {
+            left[i] = min(arr[i], left[i - 1] + 1);
+        }
+
+        // Maximum increasing height starting at i
+        right[n - 1] = 1;
+
+        for (int i = n - 2; i >= 0; i--) {
+            right[i] = min(arr[i], right[i + 1] + 1);
+        }
+
+        long long totalSum = 0;
+        int maxHeight = 0;
+
+        for (int i = 0; i < n; i++) {
+            totalSum += arr[i];
+
+            // Maximum pyramid height with center at i
+            int h = min(left[i], right[i]);
+
+            maxHeight = max(maxHeight, h);
+        }
+
+        long long maxPyramidSum = 1LL * maxHeight * maxHeight;
+
+        return (int)(totalSum - maxPyramidSum);
+    }
+};
