@@ -1,0 +1,74 @@
+class Solution {
+public:
+    int maxStackHeight(vector<int> &r, vector<int> &h) {
+        int n = r.size();
+
+        vector<pair<int, int>> discs;
+
+        for (int i = 0; i < n; i++) {
+            discs.push_back({r[i], h[i]});
+        }
+
+        // Sort by radius
+        sort(discs.begin(), discs.end());
+
+        // Fenwick tree:
+        // tree[x] = maximum stack height for height <= x
+        vector<int> bit(1002, 0);
+
+        auto query = [&](int x) {
+            int res = 0;
+
+            while (x > 0) {
+                res = max(res, bit[x]);
+                x -= x & -x;
+            }
+
+            return res;
+        };
+
+        auto update = [&](int x, int val) {
+            while (x <= 1000) {
+                bit[x] = max(bit[x], val);
+                x += x & -x;
+            }
+        };
+
+        int ans = 0;
+
+        int i = 0;
+
+        while (i < n) {
+            int j = i;
+
+            // Process all discs having the same radius together.
+            // This prevents using another disc with the same radius.
+            vector<pair<int, int>> pending;
+
+            while (j < n && discs[j].first == discs[i].first) {
+                int radius = discs[j].first;
+                int height = discs[j].second;
+
+                // Need previous height STRICTLY smaller than current height.
+                int best = query(height - 1);
+
+                int cur = best + height;
+
+                pending.push_back({height, cur});
+
+                ans = max(ans, cur);
+
+                j++;
+            }
+
+            // Only update after processing the complete radius group.
+            for (auto &p : pending) {
+                update(p.first, p.second);
+            }
+
+            i = j;
+        }
+
+        return ans;
+    }
+};
