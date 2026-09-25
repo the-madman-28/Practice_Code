@@ -1,0 +1,92 @@
+class Solution {
+public:
+    struct Box {
+        int base1, base2, height;
+    };
+
+    int maxHeight(vector<int> &height,
+                  vector<int> &width,
+                  vector<int> &length) {
+
+        int n = height.size();
+
+        vector<Box> boxes;
+
+        // Generate all 3 rotations.
+        for (int i = 0; i < n; i++) {
+
+            // Rotation 1: height = height[i]
+            int a = width[i];
+            int b = length[i];
+
+            if (a > b) swap(a, b);
+            boxes.push_back({a, b, height[i]});
+
+            // Rotation 2: height = width[i]
+            a = height[i];
+            b = length[i];
+
+            if (a > b) swap(a, b);
+            boxes.push_back({a, b, width[i]});
+
+            // Rotation 3: height = length[i]
+            a = height[i];
+            b = width[i];
+
+            if (a > b) swap(a, b);
+            boxes.push_back({a, b, length[i]});
+        }
+
+        /*
+            dp[i] = maximum height of a stack whose
+                    bottom box is boxes[i].
+        */
+
+        int m = boxes.size();
+        vector<long long> dp(m);
+
+        long long ans = 0;
+
+        /*
+            Because multiple copies of the same box are allowed,
+            we repeatedly relax the states until no improvement
+            is possible.
+
+            An easier way is to observe that if a box can be placed
+            on itself, it can be used infinitely. But strict
+            dimensions prevent that because the base would have to
+            become strictly smaller.
+
+            Therefore, cycles are impossible.
+        */
+
+        // Sort by base dimensions.
+        sort(boxes.begin(), boxes.end(), [](const Box& a, const Box& b) {
+            if (a.base1 != b.base1)
+                return a.base1 > b.base1;
+
+            return a.base2 > b.base2;
+        });
+
+        for (int i = 0; i < m; i++) {
+            dp[i] = boxes[i].height;
+        }
+
+        for (int i = 0; i < m; i++) {
+            for (int j = 0; j < i; j++) {
+
+                // boxes[j] is below boxes[i]
+                if (boxes[j].base1 > boxes[i].base1 &&
+                    boxes[j].base2 > boxes[i].base2) {
+
+                    dp[i] = max(dp[i],
+                                dp[j] + boxes[i].height);
+                }
+            }
+
+            ans = max(ans, dp[i]);
+        }
+
+        return (int)ans;
+    }
+};
