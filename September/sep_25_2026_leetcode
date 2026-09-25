@@ -1,0 +1,67 @@
+class Solution {
+    string s;
+    int pos = 0;
+
+    set<string> parseExpression() {
+        // Parse the first term
+        set<string> result = parseTerm();
+
+        // Continue concatenating terms
+        while (pos < s.size() &&
+               s[pos] != '}' &&
+               s[pos] != ',') {
+
+            set<string> next = parseTerm();
+
+            set<string> temp;
+
+            for (const string& a : result) {
+                for (const string& b : next) {
+                    temp.insert(a + b);
+                }
+            }
+
+            result = temp;
+        }
+
+        return result;
+    }
+
+    set<string> parseTerm() {
+        if (s[pos] == '{') {
+            pos++; // skip '{'
+
+            set<string> result;
+
+            while (true) {
+                set<string> part = parseExpression();
+
+                result.insert(part.begin(), part.end());
+
+                if (s[pos] == ',') {
+                    pos++; // skip ','
+                } 
+                else if (s[pos] == '}') {
+                    pos++; // skip '}'
+                    break;
+                }
+            }
+
+            return result;
+        }
+
+        // Single lowercase letter
+        char c = s[pos++];
+        return {string(1, c)};
+    }
+
+public:
+    vector<string> braceExpansionII(string expression) {
+        s = expression;
+        pos = 0;
+
+        set<string> result = parseExpression();
+
+        return vector<string>(result.begin(), result.end());
+    }
+};
