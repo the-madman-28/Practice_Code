@@ -1,0 +1,144 @@
+class Solution {
+public:
+    vector<vector<int>> adj;
+    vector<int> dist, seen;
+    int timer = 0;
+
+    int bfs(int src, string &s) {
+        ++timer;
+
+        queue<int> q;
+        q.push(src);
+
+        seen[src] = timer;
+        dist[src] = 0;
+
+        int farthest = src;
+
+        while (!q.empty()) {
+            int u = q.front();
+            q.pop();
+
+            if (dist[u] > dist[farthest])
+                farthest = u;
+
+            for (int v : adj[u]) {
+                if (s[v] != s[src])
+                    continue;
+
+                if (seen[v] == timer)
+                    continue;
+
+                seen[v] = timer;
+                dist[v] = dist[u] + 1;
+                q.push(v);
+            }
+        }
+
+        return farthest;
+    }
+
+    int longestPath(string& s, vector<vector<int>>& edges) {
+        int n = s.size();
+
+        adj.assign(n, {});
+
+        for (auto &e : edges) {
+            int u = e[0] - 1;
+            int v = e[1] - 1;
+
+            adj[u].push_back(v);
+            adj[v].push_back(u);
+        }
+
+        dist.resize(n);
+        seen.assign(n, 0);
+
+        vector<int> visited(n, 0);
+        vector<int> ecc(n, 0);
+
+        int ans = 1;
+
+        for (int start = 0; start < n; start++) {
+
+            if (visited[start])
+                continue;
+
+            /*
+                Get all nodes in this monochromatic component.
+            */
+            vector<int> nodes;
+
+            queue<int> q;
+            q.push(start);
+            visited[start] = 1;
+
+            while (!q.empty()) {
+                int u = q.front();
+                q.pop();
+
+                nodes.push_back(u);
+
+                for (int v : adj[u]) {
+                    if (!visited[v] && s[v] == s[start]) {
+                        visited[v] = 1;
+                        q.push(v);
+                    }
+                }
+            }
+
+            /*
+                Find diameter endpoints.
+            */
+
+            int A = bfs(start, s);
+            int B = bfs(A, s);
+
+            /*
+                Store distances from A.
+            */
+            vector<int> dA(nodes.size());
+
+            for (int i = 0; i < (int)nodes.size(); i++) {
+                dA[i] = dist[nodes[i]];
+            }
+
+            int diameter = dist[B];
+
+            /*
+                Distances from B.
+            */
+            bfs(B, s);
+
+            /*
+                Eccentricity of every node.
+            */
+            for (int i = 0; i < (int)nodes.size(); i++) {
+                int u = nodes[i];
+
+                ecc[u] = max(dA[i], dist[u]);
+            }
+
+            // Completely R or completely B path.
+            ans = max(ans, diameter + 1);
+        }
+
+        /*
+            Mixed paths.
+
+            Only an edge between different colors can be
+            the R -> B transition.
+        */
+        for (auto &e : edges) {
+            int u = e[0] - 1;
+            int v = e[1] - 1;
+
+            if (s[u] == s[v])
+                continue;
+
+            ans = max(ans, ecc[u] + ecc[v] + 2);
+        }
+
+        return ans;
+    }
+};
