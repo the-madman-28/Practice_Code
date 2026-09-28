@@ -1,0 +1,85 @@
+class Solution {
+    vector<int> seg;
+    int n;
+
+    int merge(int a, int b) {
+        return gcd(a, b);
+    }
+
+    void build(int node, int l, int r, vector<int>& arr) {
+        if (l == r) {
+            seg[node] = arr[l];
+            return;
+        }
+
+        int mid = (l + r) / 2;
+
+        build(2 * node, l, mid, arr);
+        build(2 * node + 1, mid + 1, r, arr);
+
+        seg[node] = merge(seg[2 * node], seg[2 * node + 1]);
+    }
+
+    void update(int node, int l, int r, int idx, int value) {
+        if (l == r) {
+            seg[node] = value;
+            return;
+        }
+
+        int mid = (l + r) / 2;
+
+        if (idx <= mid)
+            update(2 * node, l, mid, idx, value);
+        else
+            update(2 * node + 1, mid + 1, r, idx, value);
+
+        seg[node] = merge(seg[2 * node], seg[2 * node + 1]);
+    }
+
+    int query(int node, int l, int r, int ql, int qr) {
+        // Completely outside
+        if (qr < l || r < ql)
+            return 0;
+
+        // Completely inside
+        if (ql <= l && r <= qr)
+            return seg[node];
+
+        int mid = (l + r) / 2;
+
+        int left = query(2 * node, l, mid, ql, qr);
+        int right = query(2 * node + 1, mid + 1, r, ql, qr);
+
+        return gcd(left, right);
+    }
+
+public:
+    vector<int> processQueries(vector<int>& arr,
+                               vector<vector<int>>& queries) {
+        n = arr.size();
+        seg.resize(4 * n);
+
+        build(1, 0, n - 1, arr);
+
+        vector<int> ans;
+
+        for (auto &q : queries) {
+            if (q[0] == 0) {
+                // [0, l, r] -> range GCD
+                int l = q[1];
+                int r = q[2];
+
+                ans.push_back(query(1, 0, n - 1, l, r));
+            }
+            else {
+                // [1, index, value] -> point update
+                int index = q[1];
+                int value = q[2];
+
+                update(1, 0, n - 1, index, value);
+            }
+        }
+
+        return ans;
+    }
+};
