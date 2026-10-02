@@ -1,0 +1,41 @@
+class Solution {
+public:
+    string lexiString(string &s) {
+        int n = s.size();
+
+        // Try to find the best starting index
+        int i = 0, j = 1, k = 0;
+
+        while (i < n && j < n && k < n) {
+            char a = s[(i + k) % n];
+            char b = s[(j + k) % n];
+
+            if (a == b) {
+                k++;
+            }
+            else if (a > b) {
+                // Rotation starting at i is worse
+                i = i + k + 1;
+
+                // Make sure i and j are different
+                if (i == j)
+                    i++;
+
+                k = 0;
+            }
+            else {
+                // Rotation starting at j is worse
+                j = j + k + 1;
+
+                if (i == j)
+                    j++;
+
+                k = 0;
+            }
+        }
+
+        int start = min(i, j);
+
+        return s.substr(start) + s.substr(0, start);
+    }
+};
