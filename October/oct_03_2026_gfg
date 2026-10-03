@@ -1,0 +1,102 @@
+class Solution {
+public:
+    vector<vector<int>> formCoils(int n) {
+        int N = 4 * n;
+
+        // Directions for first coil:
+        // down -> right -> up -> left
+        int dx1[] = {1, 0, -1, 0};
+        int dy1[] = {0, 1, 0, -1};
+
+        // Directions for second coil:
+        // up -> left -> down -> right
+        int dx2[] = {-1, 0, 1, 0};
+        int dy2[] = {0, -1, 0, 1};
+
+        vector<vector<bool>> visited(N, vector<bool>(N, false));
+
+        vector<int> coil1, coil2;
+
+        int x1 = 0, y1 = 0;
+        int x2 = N - 1, y2 = N - 1;
+
+        int dir1 = 0;
+        int dir2 = 0;
+
+        visited[x1][y1] = true;
+        visited[x2][y2] = true;
+
+        coil1.push_back(1);
+        coil2.push_back(N * N);
+
+        int total = N * N;
+
+        while ((int)coil1.size() + (int)coil2.size() < total) {
+
+            // -------------------------
+            // Move first coil
+            // -------------------------
+            bool moved = false;
+
+            for (int turn = 0; turn < 4; turn++) {
+                int nx = x1 + dx1[dir1];
+                int ny = y1 + dy1[dir1];
+
+                if (nx >= 0 && nx < N &&
+                    ny >= 0 && ny < N &&
+                    !visited[nx][ny]) {
+
+                    x1 = nx;
+                    y1 = ny;
+
+                    visited[x1][y1] = true;
+
+                    coil1.push_back(x1 * N + y1 + 1);
+
+                    moved = true;
+                    break;
+                }
+
+                dir1 = (dir1 + 1) % 4;
+            }
+
+            if (!moved)
+                break;
+
+            if ((int)coil1.size() + (int)coil2.size() == total)
+                break;
+
+            // -------------------------
+            // Move second coil
+            // -------------------------
+            moved = false;
+
+            for (int turn = 0; turn < 4; turn++) {
+                int nx = x2 + dx2[dir2];
+                int ny = y2 + dy2[dir2];
+
+                if (nx >= 0 && nx < N &&
+                    ny >= 0 && ny < N &&
+                    !visited[nx][ny]) {
+
+                    x2 = nx;
+                    y2 = ny;
+
+                    visited[x2][y2] = true;
+
+                    coil2.push_back(x2 * N + y2 + 1);
+
+                    moved = true;
+                    break;
+                }
+
+                dir2 = (dir2 + 1) % 4;
+            }
+
+            if (!moved)
+                break;
+        }
+
+        return {coil1, coil2};
+    }
+};
