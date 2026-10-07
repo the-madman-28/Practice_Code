@@ -1,0 +1,59 @@
+/* Node Structure
+class Node {
+    int data;
+    Node left;
+    Node right;
+
+    Node(int data) {
+        this.data = data;
+        left = nullptr;
+        right = nullptr;
+    }
+}
+*/
+
+class Solution {
+public:
+    int solve(Node* root, int& ans) {
+        if (root == nullptr)
+            return 0;
+
+        // Leaf node
+        if (root->left == nullptr && root->right == nullptr)
+            return root->data;
+
+        // Only right subtree exists
+        if (root->left == nullptr)
+            return root->data + solve(root->right, ans);
+
+        // Only left subtree exists
+        if (root->right == nullptr)
+            return root->data + solve(root->left, ans);
+
+        // Both children exist
+        int leftSum = solve(root->left, ans);
+        int rightSum = solve(root->right, ans);
+
+        // Path from a leaf in left subtree
+        // to a leaf in right subtree
+        ans = max(ans, leftSum + root->data + rightSum);
+
+        // Return the best path from this node down to a leaf
+        return root->data + max(leftSum, rightSum);
+    }
+
+    int maxPathSum(Node *root) {
+        if (root == nullptr)
+            return -1;
+
+        int ans = INT_MIN;
+
+        solve(root, ans);
+
+        // If ans was never updated, there are fewer than 2 leaves.
+        if (ans == INT_MIN)
+            return -1;
+
+        return ans;
+    }
+};
