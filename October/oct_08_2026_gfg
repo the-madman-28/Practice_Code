@@ -1,0 +1,31 @@
+class Solution {
+public:
+    int maxFrequency(vector<int>& arr, int k) {
+        sort(arr.begin(), arr.end());
+
+        long long sum = 0;
+        int left = 0;
+        int ans = 1;
+
+        for (int right = 0; right < arr.size(); right++) {
+            sum += arr[right];
+
+            // Cost to make every element in [left, right]
+            // equal to arr[right]
+            long long cost = 1LL * arr[right] * (right - left + 1) - sum;
+
+            // If we need more than k operations,
+            // remove the smallest element from the window.
+            while (cost > k) {
+                sum -= arr[left];
+                left++;
+
+                cost = 1LL * arr[right] * (right - left + 1) - sum;
+            }
+
+            ans = max(ans, right - left + 1);
+        }
+
+        return ans;
+    }
+};
