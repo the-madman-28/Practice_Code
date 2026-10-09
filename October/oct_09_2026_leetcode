@@ -1,0 +1,38 @@
+class Solution {
+public:
+    int minInsertions(string s) {
+        int ans = 0;
+        int open = 0;
+
+        for (int i = 0; i < s.size(); i++) {
+
+            if (s[i] == '(') {
+                open++;
+            }
+            else {
+                // We need another ')' to make a pair.
+                if (i + 1 < s.size() && s[i + 1] == ')') {
+                    i++;
+                }
+                else {
+                    // Insert one ')' after the current ')'
+                    ans++;
+                }
+
+                // This '))' must match an opening '('.
+                if (open > 0) {
+                    open--;
+                }
+                else {
+                    // No '(' available, so insert one '('.
+                    ans++;
+                }
+            }
+        }
+
+        // Every remaining '(' needs two ')'.
+        ans += 2 * open;
+
+        return ans;
+    }
+};
