@@ -1,0 +1,26 @@
+class Solution {
+public:
+    bool balancePan(int a, int b) {
+        while (b > 0) {
+            int rem = b % a;
+
+            if (rem == 0) {
+                b /= a;
+            }
+            else if (rem == 1) {
+                // Use +a^k
+                b = (b - 1) / a;
+            }
+            else if (rem == a - 1) {
+                // Use -a^k
+                b = (b + 1) / a;
+            }
+            else {
+                // Remainder cannot be represented using -1, 0, +1
+                return false;
+            }
+        }
+
+        return true;
+    }
+};
