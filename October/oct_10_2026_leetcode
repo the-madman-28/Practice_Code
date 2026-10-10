@@ -1,0 +1,71 @@
+class Solution {
+public:
+    long long minSumSquareDiff(vector<int>& nums1, vector<int>& nums2,
+                                int k1, int k2) {
+        
+        int n = nums1.size();
+        long long k = (long long)k1 + k2;
+
+        vector<long long> diff(n);
+
+        for (int i = 0; i < n; i++) {
+            diff[i] = abs((long long)nums1[i] - nums2[i]);
+        }
+
+        sort(diff.rbegin(), diff.rend());
+
+        // If we can eliminate all differences
+        long long total = 0;
+        for (long long x : diff)
+            total += x;
+
+        if (k >= total)
+            return 0;
+
+        // Add a sentinel
+        diff.push_back(0);
+
+        for (int i = 0; i < n; i++) {
+            long long current = diff[i];
+            long long next = diff[i + 1];
+
+            // Number of elements having value >= current
+            long long count = i + 1;
+
+            // Operations required to bring first i+1 elements
+            // from current down to next.
+            long long required = (current - next) * count;
+
+            if (k >= required) {
+                k -= required;
+                continue;
+            }
+
+            // We cannot reach the next level completely.
+            long long decrease = k / count;
+            long long remainder = k % count;
+
+            long long level = current - decrease;
+
+            long long ans = 0;
+
+            // First 'remainder' elements become level - 1
+            // Remaining elements become level.
+            for (int j = 0; j < i + 1; j++) {
+                if (j < remainder)
+                    ans += (level - 1) * (level - 1);
+                else
+                    ans += level * level;
+            }
+
+            // Elements after i haven't been modified.
+            for (int j = i + 1; j < n; j++) {
+                ans += diff[j] * diff[j];
+            }
+
+            return ans;
+        }
+
+        return 0;
+    }
+};
