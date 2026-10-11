@@ -1,0 +1,51 @@
+class Solution {
+public:
+    void mergeTwoParts(vector<int>& arr) {
+        int n = arr.size();
+
+        // Find the break point
+        int mid = -1;
+
+        for (int i = 0; i < n - 1; i++) {
+            if (arr[i] > arr[i + 1]) {
+                mid = i;
+                break;
+            }
+        }
+
+        // No break point -> already sorted
+        if (mid == -1)
+            return;
+
+        vector<int> temp;
+        temp.reserve(n);
+
+        int i = 0;
+        int j = mid + 1;
+
+        // Merge the two sorted parts
+        while (i <= mid && j < n) {
+            if (arr[i] <= arr[j]) {
+                temp.push_back(arr[i]);
+                i++;
+            } else {
+                temp.push_back(arr[j]);
+                j++;
+            }
+        }
+
+        // Remaining elements from first part
+        while (i <= mid) {
+            temp.push_back(arr[i]);
+            i++;
+        }
+
+        // Remaining elements from second part
+        while (j < n) {
+            temp.push_back(arr[j]);
+            j++;
+        }
+
+        arr = temp;
+    }
+};
