@@ -1,0 +1,35 @@
+class Solution {
+public:
+    int maxSum(vector<int>& nums, int k) {
+        const long long MOD = 1000000007LL;
+
+        vector<long long> ans(k, 0);
+
+        // nums[i] <= 1e9, so bits 0..30 are enough.
+        for (int bit = 30; bit >= 0; bit--) {
+            long long cnt = 0;
+
+            for (int x : nums) {
+                if (x & (1LL << bit)) {
+                    cnt++;
+                }
+            }
+
+            // Put this bit into as many of the k numbers
+            // as possible.
+            long long take = min(cnt, (long long)k);
+
+            for (int i = 0; i < take; i++) {
+                ans[i] |= (1LL << bit);
+            }
+        }
+
+        long long result = 0;
+
+        for (long long x : ans) {
+            result = (result + x * x) % MOD;
+        }
+
+        return (int)result;
+    }
+};
