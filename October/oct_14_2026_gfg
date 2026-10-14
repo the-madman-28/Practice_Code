@@ -1,0 +1,28 @@
+class Solution {
+public:
+    string findRollOut(string& s, vector<int>& roll) {
+        int n = s.size();
+
+        vector<int> diff(n + 1, 0);
+
+        // Store the effect of each prefix roll
+        for (int x : roll) {
+            diff[0]++;
+            diff[x]--;
+        }
+
+        // Accumulated number of rolls affecting current character
+        int shift = 0;
+
+        for (int i = 0; i < n; i++) {
+            shift += diff[i];
+
+            int original = s[i] - 'a';
+            int finalChar = (original + shift) % 26;
+
+            s[i] = 'a' + finalChar;
+        }
+
+        return s;
+    }
+};
