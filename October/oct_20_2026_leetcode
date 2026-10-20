@@ -1,0 +1,82 @@
+class Solution {
+public:
+    // Checks whether nums[l ... l+k-1] is a cyclic rotation
+    // of sortedArr[l ... l+k-1]
+    bool isRotation(vector<int>& nums, vector<int>& sortedArr,
+                    int l, int k) {
+
+        // KMP prefix array for the target block
+        vector<int> pi(k, 0);
+
+        for (int i = 1; i < k; i++) {
+            int j = pi[i - 1];
+
+            while (j > 0 && sortedArr[l + i] != sortedArr[l + j])
+                j = pi[j - 1];
+
+            if (sortedArr[l + i] == sortedArr[l + j])
+                j++;
+
+            pi[i] = j;
+        }
+
+        // Search target block inside block + block.
+        // We only need the first 2*k - 1 elements.
+        int j = 0;
+
+        for (int i = 0; i < 2 * k - 1; i++) {
+            int cur = nums[l + (i % k)];
+
+            while (j > 0 && cur != sortedArr[l + j])
+                j = pi[j - 1];
+
+            if (cur == sortedArr[l + j])
+                j++;
+
+            if (j == k) {
+                // Starting position of this occurrence
+                int start = i - k + 1;
+
+                if (start < k)
+                    return true;
+
+                j = pi[j - 1];
+            }
+        }
+
+        return false;
+    }
+
+    int sortableIntegers(vector<int>& nums) {
+        int n = nums.size();
+
+        // This is the final array we need to obtain.
+        vector<int> sortedArr = nums;
+        sort(sortedArr.begin(), sortedArr.end());
+
+        int answer = 0;
+
+        // Check every divisor k of n
+        for (int k = 1; k <= n; k++) {
+
+            if (n % k != 0)
+                continue;
+
+            bool possible = true;
+
+            // Check every block
+            for (int start = 0; start < n; start += k) {
+
+                if (!isRotation(nums, sortedArr, start, k)) {
+                    possible = false;
+                    break;
+                }
+            }
+
+            if (possible)
+                answer += k;
+        }
+
+        return answer;
+    }
+};
