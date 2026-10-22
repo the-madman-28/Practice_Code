@@ -1,0 +1,67 @@
+class Solution {
+public:
+    int minOperations(vector<int>& nums) {
+        int n = nums.size();
+
+        // Already sorted
+        if (is_sorted(nums.begin(), nums.end()))
+            return 0;
+
+        int ans = INT_MAX;
+
+        // --------------------------------------------------
+        // Case 1: Rotation of [0, 1, 2, ..., n-1]
+        // --------------------------------------------------
+        int pos0 = find(nums.begin(), nums.end(), 0) - nums.begin();
+
+        bool ok = true;
+
+        // If 0 is at pos0, rotation amount is n - pos0
+        int k = (n - pos0) % n;
+
+        for (int i = 0; i < n; i++) {
+            if (nums[i] != (i + k) % n) {
+                ok = false;
+                break;
+            }
+        }
+
+        if (ok) {
+            // Directly rotate left pos0 times
+            ans = min(ans, pos0);
+
+            // Two reversals can achieve the opposite rotation
+            ans = min(ans, k + 2);
+        }
+
+        // --------------------------------------------------
+        // Case 2: Rotation of [n-1, n-2, ..., 0]
+        // --------------------------------------------------
+        int posMax =
+            find(nums.begin(), nums.end(), n - 1) - nums.begin();
+
+        k = (n - posMax) % n;
+
+        ok = true;
+
+        for (int i = 0; i < n; i++) {
+            int idx = (i + k) % n;
+            int expected = n - 1 - idx;
+
+            if (nums[i] != expected) {
+                ok = false;
+                break;
+            }
+        }
+
+        if (ok) {
+            // Reverse + k left rotations
+            ans = min(ans, k + 1);
+
+            // (n-k) left rotations + reverse
+            ans = min(ans, n - k + 1);
+        }
+
+        return ans == INT_MAX ? -1 : ans;
+    }
+};
