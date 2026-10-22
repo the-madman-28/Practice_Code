@@ -1,0 +1,74 @@
+class Solution {
+public:
+    int minimumSum(string &s) {
+        int n = s.size();
+
+        // allowed[i][c] tells whether character c can be used
+        // for the i-th position of the first half.
+        int m = (n + 1) / 2;
+
+        vector<vector<bool>> allowed(m, vector<bool>(26, true));
+
+        for (int i = 0; i < m; i++) {
+            int j = n - 1 - i;
+
+            if (s[i] != '?' && s[j] != '?' && s[i] != s[j])
+                return -1;
+
+            char fixedChar = '?';
+
+            if (s[i] != '?')
+                fixedChar = s[i];
+            else if (s[j] != '?')
+                fixedChar = s[j];
+
+            if (fixedChar != '?') {
+                fill(allowed[i].begin(), allowed[i].end(), false);
+                allowed[i][fixedChar - 'a'] = true;
+            }
+        }
+
+        const int INF = 1e9;
+
+        vector<int> dp(26, INF);
+
+        // First character
+        for (int c = 0; c < 26; c++) {
+            if (allowed[0][c])
+                dp[c] = 0;
+        }
+
+        // Build the first half of the palindrome
+        for (int i = 1; i < m; i++) {
+            vector<int> ndp(26, INF);
+
+            // Minimum dp[p] + |p-c|
+            // can be calculated in O(26) using prefix/suffix minima.
+
+            vector<int> left(26, INF), right(26, INF);
+
+            left[0] = dp[0];
+            for (int c = 1; c < 26; c++)
+                left[c] = min(dp[c], left[c - 1] + 1);
+
+            right[25] = dp[25];
+            for (int c = 24; c >= 0; c--)
+                right[c] = min(dp[c], right[c + 1] + 1);
+
+            for (int c = 0; c < 26; c++) {
+                if (!allowed[i][c])
+                    continue;
+
+                ndp[c] = min(left[c], right[c]);
+            }
+
+            dp = ndp;
+        }
+
+        int best = *min_element(dp.begin(), dp.end());
+
+        // Every edge in the first half appears twice
+        // in the complete palindrome.
+        return best * 2;
+    }
+};
