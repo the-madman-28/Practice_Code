@@ -1,0 +1,97 @@
+/* BST Node Structure
+class Node {
+public:
+    int data;
+    Node *left;
+    Node *right;
+
+    Node(int val) {
+        data = val;
+        left = right = nullptr;
+    }
+};
+*/
+
+class Solution {
+  public:
+
+    long long mergeAndCount(vector<int>& arr, vector<int>& temp,
+                            int left, int mid, int right) {
+
+        int i = left;
+        int j = mid + 1;
+        int k = left;
+
+        long long count = 0;
+
+        while (i <= mid && j <= right) {
+
+            if (arr[i] < arr[j]) {
+                temp[k++] = arr[i++];
+            }
+            else {
+                // arr[i] > arr[j]
+                // All elements from i to mid are greater than arr[j]
+                count += (mid - i + 1);
+                temp[k++] = arr[j++];
+            }
+        }
+
+        while (i <= mid)
+            temp[k++] = arr[i++];
+
+        while (j <= right)
+            temp[k++] = arr[j++];
+
+        for (int p = left; p <= right; p++)
+            arr[p] = temp[p];
+
+        return count;
+    }
+
+    long long mergeSortAndCount(vector<int>& arr, vector<int>& temp,
+                                int left, int right) {
+
+        if (left >= right)
+            return 0;
+
+        int mid = left + (right - left) / 2;
+
+        long long count = 0;
+
+        count += mergeSortAndCount(arr, temp, left, mid);
+        count += mergeSortAndCount(arr, temp, mid + 1, right);
+
+        count += mergeAndCount(arr, temp, left, mid, right);
+
+        return count;
+    }
+
+    void inorder(Node* root, vector<int>& values) {
+
+        if (root == nullptr)
+            return;
+
+        inorder(root->left, values);
+        values.push_back(root->data);
+        inorder(root->right, values);
+    }
+
+    int pairsViolatingBST(Node *root) {
+
+        vector<int> values;
+
+        // Get inorder traversal
+        inorder(root, values);
+
+        // Count inversions
+        vector<int> temp(values.size());
+
+        return mergeSortAndCount(
+            values,
+            temp,
+            0,
+            values.size() - 1
+        );
+    }
+};
