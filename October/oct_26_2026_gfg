@@ -1,0 +1,45 @@
+class Solution {
+public:
+    int minDiff(int k, vector<int> &arr) {
+
+        int n = arr.size();
+
+        // Nothing is removed
+        if (k == 0) {
+            int mn = *min_element(arr.begin(), arr.end());
+            int mx = *max_element(arr.begin(), arr.end());
+
+            return mx - mn;
+        }
+
+        multiset<int> remaining;
+
+        // Initially, all elements are in the remaining array
+        for (int x : arr)
+            remaining.insert(x);
+
+        // Remove the first subarray [0 ... k-1]
+        for (int i = 0; i < k; i++) {
+            remaining.erase(remaining.find(arr[i]));
+        }
+
+        int ans = *remaining.rbegin() - *remaining.begin();
+
+        // Slide the removed subarray
+        for (int i = k; i < n; i++) {
+
+            // arr[i-k] is no longer removed
+            remaining.insert(arr[i - k]);
+
+            // arr[i] is now removed
+            remaining.erase(remaining.find(arr[i]));
+
+            int current =
+                *remaining.rbegin() - *remaining.begin();
+
+            ans = min(ans, current);
+        }
+
+        return ans;
+    }
+};
