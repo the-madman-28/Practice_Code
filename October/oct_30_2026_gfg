@@ -1,0 +1,65 @@
+class Solution {
+public:
+    static const int MOD = 1000000007;
+
+    int cntSubsets(vector<int> &arr, int l, int r) {
+        int n = arr.size();
+
+        // We only need frequencies up to r.
+        vector<int> cnt(r + 1, 0);
+
+        for (int x : arr) {
+            if (x >= 0 && x <= r)
+                cnt[x]++;
+        }
+
+        // powers of 2
+        vector<long long> pow2(n + 1, 1);
+
+        for (int i = 1; i <= n; i++)
+            pow2[i] = (pow2[i - 1] * 2) % MOD;
+
+        long long ans = 0;
+
+        // product of (2^cnt[x] - 1) for x < current mex
+        long long required = 1;
+
+        // Number of elements among values 0..mex-1
+        int used = 0;
+
+        for (int mex = 0; mex <= r; mex++) {
+
+            // For MEX = mex:
+            // all values < mex must occur,
+            // value mex must NOT occur,
+            // values > mex are optional.
+
+            if (mex >= l) {
+                int greaterElements = n - used - cnt[mex];
+
+                long long ways =
+                    required * pow2[greaterElements] % MOD;
+
+                ans = (ans + ways) % MOD;
+            }
+
+            // Prepare for next MEX.
+            //
+            // Value mex must be present at least once
+            // when it becomes part of the required prefix.
+            long long choices =
+                (pow2[cnt[mex]] - 1 + MOD) % MOD;
+
+            required = required * choices % MOD;
+
+            used += cnt[mex];
+
+            // Once a required value doesn't exist,
+            // no larger MEX is possible.
+            if (required == 0)
+                break;
+        }
+
+        return ans;
+    }
+};
