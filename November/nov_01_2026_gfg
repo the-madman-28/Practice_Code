@@ -1,0 +1,28 @@
+class Solution {
+public:
+    int maximumSubarray(vector<int>& arr) {
+        long long normal = arr[0];
+        long long squared = 1LL * arr[0] * arr[0];
+        
+        long long ans = squared;
+        
+        for (int i = 1; i < arr.size(); i++) {
+            long long x = arr[i];
+            
+            long long newNormal = max(x, normal + x);
+            
+            long long newSquared = max({
+                x * x,                  // start subarray by squaring x
+                normal + x * x,         // square current x
+                squared + x              // already squared earlier
+            });
+            
+            normal = newNormal;
+            squared = newSquared;
+            
+            ans = max(ans, max(normal, squared));
+        }
+        
+        return (int)ans;
+    }
+};
