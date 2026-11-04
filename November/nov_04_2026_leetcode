@@ -1,0 +1,119 @@
+
+class Solution {
+public:
+    long long minOperations(vector<int>& nums, int x, int k) {
+        int n = nums.size();
+
+        multiset<int> low, high;
+        long long sumLow = 0, sumHigh = 0;
+
+        int target = (x + 1) / 2;
+
+        // Maintain median partition.
+        auto balance = [&]() {
+            while ((int)low.size() > target) {
+                auto it = prev(low.end());
+                int val = *it;
+
+                low.erase(it);
+                sumLow -= val;
+
+                high.insert(val);
+                sumHigh += val;
+            }
+
+            while ((int)low.size() < target) {
+                auto it = high.begin();
+                int val = *it;
+
+                high.erase(it);
+                sumHigh -= val;
+
+                low.insert(val);
+                sumLow += val;
+            }
+        };
+
+        auto add = [&](int val) {
+            if (low.empty() || val <= *low.rbegin()) {
+                low.insert(val);
+                sumLow += val;
+            } else {
+                high.insert(val);
+                sumHigh += val;
+            }
+        };
+
+        auto remove = [&](int val) {
+            auto it = low.find(val);
+
+            if (it != low.end()) {
+                low.erase(it);
+                sumLow -= val;
+            } else {
+                it = high.find(val);
+                high.erase(it);
+                sumHigh -= val;
+            }
+        };
+
+        auto getCost = [&]() -> long long {
+            long long median = *low.rbegin();
+
+            return median * (long long)low.size() - sumLow
+                 + sumHigh - median * (long long)high.size();
+        };
+
+        // Calculate first window cost.
+        for (int i = 0; i < x; i++) {
+            add(nums[i]);
+        }
+
+        balance();
+
+        int m = n - x + 1;
+        vector<long long> cost(m);
+
+        cost[0] = getCost();
+
+        // Calculate remaining window costs.
+        for (int i = x; i < n; i++) {
+            remove(nums[i - x]);
+
+            // Important: restore partition before insertion.
+            balance();
+
+            add(nums[i]);
+            balance();
+
+            cost[i - x + 1] = getCost();
+        }
+
+        // DP with rolling arrays.
+        const long long INF = LLONG_MAX / 4;
+
+        vector<long long> prev(n + 1, 0);
+        vector<long long> curr(n + 1, INF);
+
+        for (int j = 1; j <= k; j++) {
+            fill(curr.begin(), curr.end(), INF);
+
+            for (int i = 1; i <= n; i++) {
+                // Skip current element.
+                curr[i] = curr[i - 1];
+
+                // Select a window of size x.
+                if (i >= x && prev[i - x] != INF) {
+                    curr[i] = min(
+                        curr[i],
+                        prev[i - x] + cost[i - x]
+                    );
+                }
+            }
+
+            prev.swap(curr);
+        }
+
+        return prev[n];
+    }
+};
