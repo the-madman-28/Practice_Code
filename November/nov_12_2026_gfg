@@ -1,0 +1,18 @@
+
+class Solution {
+  public:
+    int minDiff(Node *root, int k) {
+        if (root == nullptr) return INT_MAX;
+
+        int ans = abs(root->data - k);
+
+        if (k < root->data) {
+            ans = min(ans, minDiff(root->left, k));
+        }
+        else if (k > root->data) {
+            ans = min(ans, minDiff(root->right, k));
+        }
+
+        return ans;
+    }
+};
