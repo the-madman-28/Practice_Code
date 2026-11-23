@@ -1,0 +1,38 @@
+class Solution {
+public:
+    char posInfinite(string &s, int pos) {
+        long long len = s.size();
+        vector<long long> lengths;
+
+        int step = 1;
+
+        // Calculate lengths of expansions
+        while (len < pos) {
+            len = 2 * len + step;
+            lengths.push_back(len);
+            step++;
+        }
+
+        // Trace the position backward
+        for (int i = lengths.size() - 1; i >= 0; i--) {
+            long long newLen = lengths[i];
+            long long oldLen = (newLen - (i + 1)) / 2;
+            long long dollarCount = i + 1;
+
+            if (pos <= oldLen) {
+                // Position is in the original string
+                continue;
+            }
+            else if (pos <= oldLen + dollarCount) {
+                // Position is in the '$' section
+                return '$';
+            }
+            else {
+                // Position is in the reversed copy
+                pos = newLen - pos + 1;
+            }
+        }
+
+        return s[pos - 1];
+    }
+};
