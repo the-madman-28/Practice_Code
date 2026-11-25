@@ -1,0 +1,90 @@
+
+class Solution {
+    using ll = long long;
+    static constexpr ll MOD = 1000000007LL;
+
+    // Minimum normal movement time to reach position x
+    ll timeToReach(ll x, ll a, ll b) {
+        if (x <= a)
+            return x;
+
+        ll c = a - b;
+        ll q = (x - a + c - 1) / c;
+
+        return x + 2 * b * q;
+    }
+
+    // Sum of ceil(y / c) for y = 1 to n
+    ll ceilSum(ll n, ll c) {
+        if (n <= 0)
+            return 0;
+
+        ll q = n / c;
+        ll rem = n % c;
+
+        return c * q * (q + 1) / 2
+               + rem * (q + 1);
+    }
+
+    // Sum of T(x) for x = 1 to X
+    ll prefixSum(ll X, ll a, ll b) {
+        if (X <= 0)
+            return 0;
+
+        ll ans = X * (X + 1) / 2;
+
+        if (X > a) {
+            ll c = a - b;
+            ans += 2 * b * ceilSum(X - a, c);
+        }
+
+        return ans;
+    }
+
+public:
+    int minTime(int a, int b, int d, int l, int r) {
+        ll normal = timeToReach(d, a, b);
+
+        // Find the first jump length where
+        // using the jump is no slower than normal movement.
+        int low = l, high = r + 1;
+
+        while (low < high) {
+            int mid = low + (high - low) / 2;
+
+            ll jumpTime = 1 + timeToReach(d - mid, a, b);
+
+            if (jumpTime <= normal)
+                high = mid;
+            else
+                low = mid + 1;
+        }
+
+        int firstJump = low;
+
+        // All jump lengths use normal movement.
+        if (firstJump == r + 1) {
+            return (normal % MOD) * (r - l + 1) % MOD;
+        }
+
+        // Jump lengths before firstJump use normal movement.
+        ll normalCount = firstJump - l;
+        ll ans = (normal % MOD) * normalCount % MOD;
+
+        // For j in [firstJump, r]:
+        // x = d - j
+        // Therefore x ranges from d-r to d-firstJump.
+        ll L = d - r;
+        ll R = d - firstJump;
+
+        ll jumpSum = prefixSum(R, a, b)
+                   - prefixSum(L - 1, a, b);
+
+        // Add one second for each special jump.
+        jumpSum += (r - firstJump + 1);
+
+        ans = (ans + jumpSum % MOD) % MOD;
+
+        return (int)ans;
+    }
+};
