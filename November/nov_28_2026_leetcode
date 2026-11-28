@@ -1,0 +1,58 @@
+class Solution {
+public:
+    int maximumSaleItems(vector<vector<int>>& items, int budget) {
+        int n = items.size();
+
+        vector<int> freq(n + 1, 0);
+        int minPrice = INT_MAX;
+
+        // Count frequency of each factor
+        for (auto &item : items) {
+            freq[item[0]]++;
+            minPrice = min(minPrice, item[1]);
+        }
+
+        // Count eligible free items for each factor
+        vector<int> freeCnt(n + 1, 0);
+
+        for (int i = 1; i <= n; i++) {
+            int cnt = 0;
+
+            for (int j = i; j <= n; j += i) {
+                cnt += freq[j];
+            }
+
+            freeCnt[i] = cnt - 1;
+        }
+
+        // Store profitable deals: {price, free item count}
+        vector<pair<int, int>> deals;
+
+        for (auto &item : items) {
+            int factor = item[0];
+            int price = item[1];
+
+            if (freeCnt[factor] > 0 && price < 2 * minPrice) {
+                deals.push_back({price, freeCnt[factor]});
+            }
+        }
+
+        // Buy cheaper deals first
+        sort(deals.begin(), deals.end());
+
+        long long ans = 0;
+
+        for (auto &[price, cnt] : deals) {
+            long long take = min((long long)cnt,
+                                 (long long)budget / price);
+
+            ans += 2 * take;
+            budget -= take * price;
+        }
+
+        // Spend remaining budget on the cheapest item
+        ans += budget / minPrice;
+
+        return (int)ans;
+    }
+};
